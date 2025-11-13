@@ -1,0 +1,1386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feelin' Hot - Jamaica Heat Impact</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- LOAD PLOTLY -->
+    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+
+
+    <style>
+        /* ==================== RESET & BASE ==================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --plasma-purple: #3e049c;
+            --plasma-magenta: #a62098;
+            --plasma-orange: #f78410;
+            --plasma-yellow: #fcd225;
+            --accent-teal: #04c2a6;
+            --accent-pink: #c03a83;
+            --accent-coral: #d8576b;
+            --bg-white: #ffffff;
+            --bg-offwhite: #fafafa;
+            --text-dark: #1a1a1a;
+            --text-gray: #666666;
+            --text-light: #999999;
+            --font-display: 'Space Grotesk', monospace;
+            --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        html { scroll-behavior: smooth; }
+        
+        body {
+            font-family: var(--font-body);
+            font-size: 18px;
+            line-height: 1.7;
+            color: var(--text-dark);
+            background: var(--bg-white);
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+        
+        /* ==================== TYPOGRAPHY ==================== */
+        h1, h2, h3, h4 {
+            font-family: var(--font-display);
+            font-weight: 700;
+            line-height: 1.2;
+        }
+        
+        h1 { font-size: clamp(48px, 8vw, 84px); margin-bottom: 0.3em; }
+        h2 { font-size: clamp(32px, 5vw, 56px); margin-bottom: 0.5em; }
+        h3 { font-size: clamp(24px, 4vw, 36px); margin-bottom: 0.4em; }
+        h4 { font-size: clamp(20px, 3vw, 28px); margin-bottom: 0.3em; }
+        
+        p { margin-bottom: 1.5em;}
+        
+        .lead-text {
+            font-size: clamp(20px, 2.5vw, 24px);
+            line-height: 1.6;
+            font-weight: 400;
+            /*text-align: justify;*/
+        }
+        
+        .drop-cap::first-letter {
+            float: left;
+            font-size: 5em;
+            line-height: 0.85;
+            margin: 0.05em 0.1em 0 0;
+            font-weight: 700;
+            color: var(--text-dark);
+            /*color: var(--accent-coral);*/
+            font-family: var(--font-display);
+        }
+        
+        .content-section p,
+        .container p,
+        /*.centered-content p,*/
+        .centered-content {
+            font-size:20 px;
+        }
+
+        .lead-text { text-align: left; }
+        
+        .viz-caption {
+            font-size: 14px;
+            color: var(--text-light);
+            font-style: italic;
+            text-align: center;
+            margin-top: 0.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .highlight-purple { 
+            background-color: var(--plasma-purple); 
+            color: white;
+            padding: 2px 5px;
+            border-radius: 3px;
+            /*font-weight: 600; */
+        }
+        .highlight-yellow { 
+            background-color: var(--plasma-yellow);
+            color: white;
+            padding: 2px 5px;
+            border-radius: 3px; 
+        }
+
+        .highlight-orange { 
+            background-color: var(--plasma-orange);
+            color: white;
+            padding: 2px 5px;
+            border-radius: 3px; 
+            /*font-weight: 600; */
+        }
+
+        .highlight-magenta { 
+            background-color: var(--plasma-magenta); 
+            color: white;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+
+
+
+        /* ==================== NAVIGATION ==================== */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 1rem 2rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        nav ul {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        nav a {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-family: var(--font-display);
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+        
+        nav a:hover,
+        nav a.active {
+            color: var(--plasma-purple);
+            background: rgba(62, 4, 156, 0.05);
+        }
+        
+        /* ==================== LAYOUT CONTAINERS ==================== */
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        
+        .container-wide {
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        
+        .centered-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        
+        /* ==================== SECTIONS ==================== */
+        section { padding: 4rem 0; }
+        .content-section { padding: 4rem 0; }
+        
+        /* ==================== HERO SECTION ==================== */
+        .hero {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background-size: cover;
+            background-position: center;
+            padding-bottom: 4rem;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.5));
+            z-index: 1;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            color: white;
+            max-width: 900px;
+            padding: 2rem;
+        }
+        
+        .hero h1 {
+            color: white;
+            text-shadow: 0 4px 12px rgba(0,0,0,0.6);
+            font-size: clamp(56px, 10vw, 96px);
+        }
+        
+        .hero .subtitle {
+            font-size: clamp(20px, 3vw, 28px);
+            font-weight: 500;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+            line-height: 1.4;
+        }
+        
+        /* ==================== LOGO SECTION ==================== */
+        .logo-section {
+            background: var(--bg-white);
+            padding: 3rem 0;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 200px;
+        }
+        
+        .logo-wrapper {
+            display: flex;
+            justify-content: flex-start;
+            max-width: 1200px;
+            width: 100%;
+            padding: 0 2rem;
+        }
+        
+        .project-logo {
+            max-width: 200px;
+            display: block;
+            margin-left: calc(50% - 10%);
+        }
+        
+        /* ==================== SECTION TITLES ==================== */
+        .section-title {
+            position: relative;
+            width: 100vw;
+            margin-left: calc(50% - 50vw);
+            padding: 8rem 2rem;
+            min-height: 50vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-size: cover;
+            background-position: center;
+            text-align: center;
+            margin-top: 4rem;
+            margin-bottom: 4rem;
+        }
+        
+        .section-title::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.6));
+        }
+        
+        .section-title h2 {
+            position: relative;
+            z-index: 2;
+            color: white;
+            text-shadow: 0 4px 12px rgba(0,0,0,0.6);
+            font-size: clamp(36px, 6vw, 64px);
+        }
+        
+        /* ==================== VISUALIZATIONS ==================== */
+        .viz-container {
+            margin: 4rem auto;
+            text-align: center;
+            max-width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .viz-container img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        .viz-container .iframe-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 1080px;
+            margin: 0 auto;
+            overflow-x: auto;
+            overflow-y: hidden;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        .viz-container iframe {
+            border: none;
+            border-radius: 8px;
+            width: 1080px;
+            min-width: 1080px;
+            display: block;
+        }
+
+        /* ==================== TEXT WITH FLOATING EMBED ==================== */
+        .text-with-embed {
+            max-width: 1200px;
+            margin: 4rem auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: start;
+        }
+        
+        .embed-float {
+            position: sticky;
+            top: 120px;
+        }
+        
+        .embed-float .flourish-embed {
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .text-flow p {
+            font-size: 20px;
+            line-height: 1.8;
+            margin-bottom: 1.5em;
+        }
+        
+        /* ==================== KEY FINDINGS ==================== */
+        .key-finding {
+            background: var(--bg-offwhite);
+            padding: 3rem;
+            border-radius: 12px;
+            margin: 4rem auto;
+            max-width: 900px;
+            /*border-left: 6px solid var(--plasma-purple);*/
+        }
+        
+        .key-finding p {
+            font-size: clamp(22px, 3vw, 28px);
+            font-weight: 500;
+            line-height: 1.5;
+            margin: 0;
+        }
+        
+        .key-finding .percentage {
+            font-size: clamp(48px, 6vw, 72px);
+            font-family: var(--font-display);
+            font-weight: 700;
+            color: var(--accent-coral);
+            /*color: var(--accent-pink);*/
+            display: inline-block;
+            margin-right: 0.3em;
+        }
+        
+        /* ==================== QUOTES ==================== */
+        .quote-block {
+            margin: 4rem auto;
+            max-width: 900px;
+        }
+        
+        blockquote {
+            font-size: clamp(22px, 2.8vw, 28px);
+            line-height: 1.7;
+            font-style: italic;
+            color: var(--text-gray);
+            padding: 2rem 0;
+            position: relative;
+        }
+        
+        blockquote::before {
+            content: '"';
+            font-size: 120px;
+            color: var(--plasma-purple);
+            opacity: 0.15;
+            position: absolute;
+            left: -40px;
+            top: -20px;
+            font-family: Georgia, serif;
+        }
+        
+        .quote-attribution {
+            font-size: 17px;
+            color: var(--text-gray);
+            font-style: normal;
+            margin-top: 1rem;
+            font-weight: 500;
+            display: block;
+        }
+        
+        /* ==================== TEXT-WRAPPED IMAGES ==================== */
+        .text-wrap-image {
+            float: right;
+            max-width: 500px;
+            margin: 0 0 2rem 2rem;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        }
+        
+        .text-wrap-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        .text-wrap-image figcaption {
+            font-size: 14px;
+            color: var(--text-light);
+            padding: 0.5rem;
+            font-style: italic;
+        }
+        
+        /* ==================== SUPPLEMENTAL PHOTOS ==================== */
+        .supplemental-photo {
+            max-width: 800px;
+            margin: 4rem auto;
+            text-align: center;
+        }
+        
+        .supplemental-photo img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        }
+        
+        /* ==================== CAROUSEL ==================== */
+        .carousel-container {
+            position: relative;
+            max-width: 1440px;
+            margin: 4rem auto;
+            padding: 0 2rem;
+        }
+
+        .carousel-slides {
+            position: relative;
+            width: 100%;
+            overflow-x: auto;
+            overflow-y: hidden;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            scroll-behavior: smooth;
+        }
+
+        /* *** CRITICAL FIX: Use opacity/visibility with height management *** */
+        .carousel-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
+            height: 0 !important;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .carousel-slide.active {
+            position: relative;
+            opacity: 1;
+            visibility: visible;
+            height: auto !important;
+            overflow: visible;
+            pointer-events: auto;
+        }
+
+        .carousel-slide iframe {
+            width: 1080px;
+            min-width: 1080px;
+            max-width: none;
+            display: block;
+            border: none;
+            border-radius: 8px;
+            margin: 0 auto;
+        }
+
+        .carousel-slide .iframe-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            overflow-y: hidden;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        .carousel-slide img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .carousel-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: var(--text-dark);
+            transition: all 0.3s ease;
+            z-index: 10;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .carousel-arrow:hover {
+            background: white;
+            transform: translateY(-50%) scale(1.1);
+        }
+        
+        .carousel-arrow.prev { left: 20px; }
+        .carousel-arrow.next { right: 20px; }
+        
+        /* ==================== BUTTONS ==================== */
+        .btn {
+            display: inline-block;
+            padding: 1rem 2.5rem;
+            background: var(--plasma-purple);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(62, 4, 156, 0.3);
+        }
+        
+        .btn:hover {
+            background: var(--plasma-magenta);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(62, 4, 156, 0.4);
+        }
+        
+        /* ==================== ABOUT SECTION ==================== */
+        .about-section {
+            background: var(--bg-offwhite);
+            padding: 6rem 2rem;
+        }
+        
+        .subsection {
+            margin: 4rem auto;
+            max-width: 800px;
+        }
+        
+        .subsection h3 {
+            color: var(--plasma-purple);
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+        
+        .clearfix::after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+        
+        .credits { line-height: 2; }
+        
+        /* ==================== FADE IN ANIMATION ==================== */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* ==================== RESPONSIVE ==================== */
+        @media (max-width: 1200px) {
+            .viz-container .iframe-wrapper,
+            .carousel-container {
+                max-width: 100%;
+                padding: 0 1rem;
+            }
+            
+            .viz-container .iframe-wrapper::after,
+            .carousel-slides::after {
+                content: '← Scroll →';
+                position: absolute;
+                bottom: 10px;
+                right: 10px;
+                background: rgba(0,0,0,0.6);
+                color: white;
+                padding: 4px 8px;
+                border-radius: 4px;
+                font-size: 11px;
+                pointer-events: none;
+                opacity: 0.7;
+            }
+        }
+
+        @media (max-width: 900px) {
+            nav ul { gap: 1rem; }
+            nav a { font-size: 12px; padding: 0.4rem 0.8rem; }
+            .text-with-embed { grid-template-columns: 1fr; gap: 2rem; }
+            .embed-float { position: relative; top: 0; order: -1; }
+            .text-wrap-image { float: none; max-width: 100%; margin: 2rem 0; }
+            .carousel-arrow { width: 40px; height: 40px; font-size: 20px; }
+            .carousel-arrow.prev { left: 10px; }
+            .carousel-arrow.next { right: 10px; }
+            blockquote::before { font-size: 80px; left: -20px; }
+            .section-title { padding: 6rem 2rem; min-height: 40vh; }
+            .project-logo { margin-left: auto; margin-right: auto; }
+            .viz-container iframe,
+            .carousel-slide iframe { min-height: 600px; }
+        }
+
+        @media (max-width: 600px) {
+            section { padding: 3rem 0; }
+            .content-section { padding: 3rem 0; }
+            nav { padding: 0.8rem 1rem; }
+            nav ul { gap: 0.5rem; }
+            .container,
+            .container-wide,
+            .centered-content { padding: 0 1.5rem; }
+            .viz-container iframe,
+            .carousel-slide iframe { min-height: 500px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav id="main-nav">
+        <ul>
+            <li><a href="#work">Heat at work</a></li>
+            <li><a href="#schools">Schools & care centers</a></li>
+            <li><a href="#outdoor-vendors">Outdoor vendors</a></li>
+            <li><a href="#solutions">Solutions</a></li>
+            <li><a href="#about">About</a></li>
+        </ul>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" style="background-image: url('assets/photos/sunlight-through-palm-trees.jpg');">
+        <div class="hero-content">
+            <h1>Feelin' Hot</h1>
+            <p class="subtitle">How extreme heat impacts vulnerable communities in Clarendon Parish, Jamaica</p>
+        </div>
+    </section>
+
+    <!-- Logo Section -->
+    <div class="logo-section">
+        <div class="logo-wrapper">
+            <img src="https://images.squarespace-cdn.com/content/v1/6790ada12a4b2f46a5aec2ae/6ed2012e-2de5-4e2a-b580-d22596dbc2c2/logo+feelin+HOT.png?format=1500w" alt="Feelin' Hot Logo" class="project-logo">
+        </div>
+    </div>
+
+    <!-- Intro Section -->
+    <section class="content-section">
+        <div class="centered-content">
+            <p class="lead-text drop-cap">From schoolchildren in sweltering classrooms, to elders with pre-existing conditions, multiple Jamaican communities face disproportionate health risks due to mounting days of extreme heat.</p>
+            <p class="lead-text">To understand their daily experiences and desired interventions, the Feelin' Hot Caribbean climate resilience project set out to interview members of the most vulnerable communities, from May-July of 2025.</p>
+        </div>
+    </section>
+
+    <!-- Wordstream Visualization -->
+    <section class="content-section">
+        <div class="container-wide">
+            <div class="viz-container">
+                <img src="assets/images/wordstream.png" alt="Word stream visualization">
+                <p class="viz-caption">Most frequent words used in response to survey questions, visualized via WordStream</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Text with Floating Embed -->
+    <section class="content-section">
+        <div class="text-with-embed">
+            <div class="text-flow">
+                <p>This report explores the results of the surveys, in which participants provided open-ended responses to questions regarding the impact of heat at home, work and school. </p>
+                <p>Conducted in and around May Pen, the capital of the southern parish of Clarendon, the bulk of the 54 surveys reflect the experiences of teachers.</p>
+                <p>But a handful of other community members also weighed in, with caregivers, coaches and outdoor workers also subject to excessive exposure to extreme heat.</p>
+            </div>
+            <div class="embed-float">
+                <div class="flourish-embed" data-src="story/3340756"><script src="https://public.flourish.studio/resources/embed.js"></script><noscript><img src="https://public.flourish.studio/story/3340756/thumbnail" width="100%" alt="visualization" /></noscript></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Key Finding 1 -->
+    <section class="content-section">
+        <div class="container">
+            <div class="key-finding fade-in">
+                <p><span class="percentage">37%</span> of all respondents described experiencing heat stress symptoms or witnessing symptoms in their students or patients</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Heat Stress Carousel -->
+    <section class="content-section">
+        <div class="container-wide">
+            <div class="carousel-container fade-in" data-carousel="heat-stress">
+                <div class="carousel-slides">
+                    <div class="carousel-slide active">
+                        <img src="assets/images/heat_stress_symptoms.png" alt="Heat stress symptoms">
+                    </div>
+                    <div class="carousel-slide">
+                        <img src="assets/images/heat_stress_keywords.png" alt="Heat stress keywords">
+                    </div>
+                </div>
+                <button class="carousel-arrow prev" data-carousel="heat-stress" data-direction="-1">‹</button>
+                <button class="carousel-arrow next" data-carousel="heat-stress" data-direction="1">›</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quote 1 & 2 -->
+    <section class="content-section">
+        <div class="container">
+            <div class="quote-block fade-in">
+                <blockquote>
+                The heat feels like it is penetrating into your brain and it's like a burning, injurious heart... The other day, I had to run out of the sun and put something on my head. You could feel the heat, like you are going to pass out, straight away. I had to come out of the sun and say, 'No sir. We are waiting until this is over to go back out again.'
+                </blockquote>
+                <p class="quote-attribution">— May Pen street vendor</p>
+            </div>
+
+            <div class="quote-block fade-in">
+                <blockquote>
+                    The auditorium, it is very small. So when the students go there, most of the time, they're sweating. I remember there were a few students - I don't know if it was heat stroke or what - but two of them just fainted.
+                </blockquote>
+                <p class="quote-attribution">— Central High School teacher</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- PART I: Work -->
+    <div id="work" class="section-title" style="background-image: url('assets/photos/fruit-stand-clarendon.jpg');">
+        <h2>Part I. Work</h2>
+    </div>
+
+    <section class="content-section">
+        <div class="container">
+            <div class="key-finding fade-in">
+                <p><span class="percentage">92%</span> of all respondents said heat adversely impacted their work</p>
+            </div>
+
+            <div class="viz-container fade-in">
+                <div id="15e6166d-e58a-4915-b1b8-7d350759ede3" class="plotly-graph-div" style="height:1020px; width:1020px;"></div>
+            </div>
+            <div class="viz-container fade-in">
+                <div id="e636780a-c351-414a-a2d9-5bf26fc938df" class="plotly-graph-div" style="height:800px; width:950px;"></div>   
+            </div>
+
+            <div class="quote-block fade-in">
+                <blockquote>
+                    For teachers as well as the students, once you get to the afternoons, everybody just feels exhausted and miserable.
+                </blockquote>
+                <p class="quote-attribution">— May Pen teacher</p>
+            </div>
+
+            <div class="quote-block fade-in">
+                <blockquote>
+                    Here in the day, this is gruesome. And you find that if the breeze even do blow, the heat penetrates you more than the breeze blows at you.
+                </blockquote>
+                <p class="quote-attribution">— May Pen street vendor</p>
+            </div>
+
+            <div class="quote-block fade-in">
+                <blockquote>
+                    Miserable... You feel hot. You just want to go and have your bath. But you can't do it because you are working.
+                </blockquote>
+                <p class="quote-attribution">— Buckshaven caregiver</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- PART II: Schools & Care Centers -->
+    <div id="schools" class="section-title" style="background-image: url('assets/photos/schoolchildren-outdoors.jpg');">
+        <h2>Part II. Heat in schools and nursing homes</h2>
+    </div>
+
+    <section class="content-section">
+        <div class="container">
+            <!-- <div class="subsection">
+                <h3>Classroom conditions</h3>
+            </div> -->
+
+            <div class="centered-content clearfix">
+                <p>Interviews with teachers and coaches focused on learning conditions, disparities in vulnerability among student populations, the affect of heat on students' performance and coping mechanisms used to mitigate its impact.
+                    <br><br>
+                    <!-- Caregivers were asked a similar series of questions regarding their patients. Both groups predominantly relied on hydration and fans to attempt to cool their environments and observed that students and patients with pre-existing health conditions particularly struggled with the heat.  -->
+                </p>
+                </div>
+
+            <div class="key-finding fade-in">
+                <p><span class="percentage">91%</span> of all educators said their classroom did not have AC, with many noting that their fan(s) did little to mitigate the heat</p>
+                <p style="margin-top: 1rem;"><span class="percentage">4%</span> said their classroom had neither AC nor a fan.</p>
+            </div>
+
+            <div class="viz-container fade-in">
+                <div id="228b963d-b99b-42f8-b59d-3d2b23a0a0e4" class="plotly-graph-div" style="height:500px; width:1000px;"></div> 
+            </div>
+
+            <div class="quote-block fade-in">
+                <blockquote>
+                    We have fans in the classrooms, no AC. But to get effective cooling from the fan, you have to sit directly beneath the fan. So if students are on the outer section of the room, they are always hot and feeling fatigued, always want water.
+                </blockquote>
+                <p class="quote-attribution">— Denbigh teacher</p>
+            </div>
+
+            <div class="viz-container fade-in">
+                <img src="assets/images/sentiment.png" alt="Teaching sentiment during summer">
+            </div>
+
+            <div class="quote-block fade-in">
+                <blockquote>
+                    A number of students just shut down completely. They go to sleep, they are disruptive, they become hyperactive...Students would learn much better if they were in a classroom where they did not have to feel all of that heat.
+                </blockquote>
+                <p class="quote-attribution">— May Pen high school teacher</p>
+            </div>
+
+           <!--  <div class="subsection" style="margin-top: 4rem;">
+                <h3>Impacts and Coping Mechanisms</h3>
+            </div> -->
+
+            <div class="key-finding fade-in">
+                <p><span class="percentage">96%</span> of educators said heat impacted students' attention or peformance</p>
+                <!-- <p style="margin-top: 1rem;"><span class="percentage">100%</span> of caregivers said their patients had a harder time during summer months</p> -->
+            </div>
+
+             <div class="centered-content clearfix">
+                <p>Caregivers were asked similar questions as educators, regarding their patients. Both groups said that they predominantly relied on hydration and fans to attempt to cool their environments, and observed that students and patients with pre-existing health conditions struggled in particular with the heat.</p>
+            </div>
+
+            <!-- <div class="key-finding fade-in">
+                            <p><span class="percentage">100%</span> of caregivers said their patients had a harder time during summer months</p>
+                        </div> -->
+
+            <!-- FIXED: Student and Patient Impacts Carousel -->
+            <div class="carousel-container fade-in" data-carousel="impacts">
+                            <div class="carousel-slides">
+                                <div class="carousel-slide active">
+                                    <div id="58275d85-36eb-4197-a762-bb71f45d1331" class="plotly-graph-div" style="height:500px; width:1000px;"></div>  
+                                </div>
+                                <div class="carousel-slide">
+                                    <div id="6ec1fd66-d9c6-471c-90d8-7c07263b88ff" class="plotly-graph-div" style="height:500px; width:1000px;"></div>
+                                </div>
+                            </div>
+                            <button class="carousel-arrow prev" data-carousel="impacts" data-direction="-1">‹</button>
+                            <button class="carousel-arrow next" data-carousel="impacts" data-direction="1">›</button>
+                        </div>
+
+            <!-- <div class="key-finding fade-in">
+                            <p>Asked a similar series of questions as educators: 
+                            <p style="margin-top: 1rem;"><span class="percentage">100%</span> of caregivers said their patients had a harder time during summer months</p>
+                        </div> -->
+
+
+
+            <!-- <div class="carousel-container fade-in" data-carousel="impacts">
+                <div class="carousel-slides">
+                    <div class="carousel-slide active">
+                        <div class="iframe-wrapper">
+                            <iframe src="assets/interactive/student_impacts.html" style="height: 500px;"></iframe>
+                        </div>
+                    </div>
+                    <div class="carousel-slide">
+                        <div class="iframe-wrapper">
+                            <iframe src="assets/interactive/patient_impacts.html" style="height: 500px;"></iframe>
+                        </div>
+                    </div>
+                </div>
+                <button class="carousel-arrow prev" data-carousel="impacts" data-direction="-1">‹</button>
+                <button class="carousel-arrow next" data-carousel="impacts" data-direction="1">›</button>
+            </div> -->
+
+            <!-- FIXED: Coping Mechanisms Carousel -->
+            <div class="carousel-container fade-in" data-carousel="coping">
+                <div class="carousel-slides">
+                    <div class="carousel-slide active">
+                        <div id="7e02e0a4-6b7a-4fb5-88bb-20e7a1c269d4" class="plotly-graph-div" style="height:1080px; width:100%;"></div>
+                    </div>
+                    <div class="carousel-slide">
+                        <div id="36931a69-82e0-47b3-9fd6-c165b1698e03" class="plotly-graph-div" style="height:1080px; width:100%;"></div>
+                    </div>
+                    <div class="carousel-slide">
+                        <div id="11ffc9b4-7534-4b80-9af2-a1a7b37adfc0" class="plotly-graph-div" style="height:1080px; width:100%;"></div> 
+                    </div>
+                </div>
+                <button class="carousel-arrow prev" data-carousel="coping" data-direction="-1">‹</button>
+                <button class="carousel-arrow next" data-carousel="coping" data-direction="1">›</button>
+                <p class="viz-caption">Click and hover on the legend and charts to explore the responses.</p>
+            </div>
+
+            <div class="quote-block fade-in">
+                <blockquote>
+                    They have to be hydrated. Sometimes we take three breaks and you have less than an hour to teach them... It really hampers our lesson for the day and teaching time with them.
+                </blockquote>
+                <p class="quote-attribution">— Denbigh coach</p>
+            </div>
+
+            <div class="quote-block fade-in">
+                <blockquote>
+                    My elderly clients around this time, their high blood pressure is usually elevated.
+                </blockquote>
+                <p class="quote-attribution">— May Pen caregiver</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- PART III: Outdoor Vendors -->
+    <div id="outdoor-vendors" class="section-title" style="background-image: url('assets/photos/vendor.jpg');">
+        <h2>Part III. Outdoor work</h2>
+    </div>
+
+    <section class="content-section">
+        <div class="container">
+            <div class="viz-container fade-in">
+                <div id="b3ce76e1-0f65-43a9-90c3-43cc70e07849" class="plotly-graph-div" style="height:1420px; width:1080px;"></div> 
+            </div>
+
+            <div class="quote-block fade-in">
+                <blockquote>
+                    You just have to just work right through it. You don't take breaks. The breaks is when you don't have a customer.
+                </blockquote>
+                <p class="quote-attribution">— May Pen market vendor</p>
+            </div>
+             <div class="quote-block fade-in">
+                <blockquote>
+                    The AC bills is very high and the heat is very hot...This is our business, and whatever condition it comes with, we have to work with it.
+                </blockquote>
+                <p class="quote-attribution">— May Pen market vendor</p>
+            </div>
+
+
+        </div>
+    </section>
+
+    <!-- PART IV: Solutions -->
+    <div id="solutions" class="section-title" style="background-image: url('assets/photos/breadfruit-tree.jpg');">
+        <h2>Part IV. Solutions</h2>
+    </div>
+
+    <section class="content-section">
+        <div class="container">
+            <div class="centered-content clearfix">
+            <p>The vast majority of heat-mitigating interventions that survey participants requested involved some form of increased cooling or shade, from more widespread installation of ac and fans, to the preservation or planting of trees. <br><br>Among the remaining responses, participants most often cited affordable electricity, government action and changes to the built environment.</p>
+        </div>
+
+            <div class="key-finding fade-in">
+                <p style="margin-top: 1rem;"><span class="percentage">23%</span> of suggested solutions advocated for increased personal access to AC</p>
+                <p style="margin-top: 1rem;"><span class="percentage">20%</span> of suggested solutions sought sufficient fans</p>
+                <p style="margin-top: 1rem;"><span class="percentage">16%</span> of suggested solutions were devoted to planting trees</p>
+            </div>
+
+            <div class="viz-container fade-in">
+                <div id="2fa87fe5-cd81-4a1f-a600-28ca1935f216" class="plotly-graph-div" style="height:800px; width:950px;"></div>
+            </div>
+
+            <!-- <div class="subsection" style="margin-top: 4rem;">
+                <h3>Solutions by category</h3>
+                <p>The vast majority of suggestions entailed some form of increased cooling or shade. The remaining responses included government action, renewable energy investments and changes to the built environment. To explore specific solutions suggested and broader themes among them, click through the visualizations below.</p>
+            </div> -->
+
+            <div class="viz-container fade-in">
+                <div id="d00ab2ba-6fef-4805-87ae-74a5136f0b0f" class="plotly-graph-div" style="height:800px; width:800px;"></div>
+            <div class="viz-container fade-in">
+                <div id="c7b67d6c-b0e5-49e2-82c7-650d2c0edd80" class="plotly-graph-div" style="height:700px; width:1000px;"></div>
+            </div>
+
+            <div class="quote-block fade-in">
+                <blockquote>
+                    In the summer, we need to have those buildings where you can go in and cool down. We don't have that, unless you find yourself in somebody's store. Outside of a supermarket, the store whatever, we need to have that where you can't go in and cool down.
+                </blockquote>
+                <p class="quote-attribution">— May Pen market vendor</p>
+            </div>
+
+            <div class="quote-block fade-in">
+                <blockquote>
+                    Development is happening without any space for rainwater harvesting, for the creation of green spaces.
+                </blockquote>
+                <p class="quote-attribution">— Denbigh teacher</p>
+            </div>
+
+            <div class="quote-block fade-in">
+                <blockquote>
+                    They need to invest in solar to run the ACs. If the administration is going to buy ACs to go into the classrooms, government needs to fund the solar panels.
+                </blockquote>
+                <p class="quote-attribution">— Denbigh teacher</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ABOUT Section -->
+    <div id="about" class="section-title" style="background-image: url('assets/photos/street-view-car.jpg');">
+        <h2>About</h2>
+    </div>
+
+    <section class="about-section">
+        <div class="container">
+            <div class="centered-content clearfix">
+                <figure class="text-wrap-image">
+                    <img src="assets/images/lst_avg_summer_2024_jamaica.png" alt="Jamaica land surface temperature map">
+                    <figcaption>Average summer land surface temperatures across Jamaica in 2024 | Map by Muskaan Khemani/Feelin' Hot | Data: U.S. Geological Survey Landsat−8 and Landsat−9</figcaption>
+                </figure>
+                
+                <p>Feelin' Hot is a UNESCO-funded initiative that leverages cutting-edge satellite technology to create climate heat maps for Aruba, Curaçao, St. Maarten, and Jamaica. The project aims to empower communities with data-driven insights that can inform future urban planning and climate adaptation decisions. For more information about the project's heat mapping, visit <a href="https://feelinghot.org" target="_blank" style="color: var(--plasma-purple); text-decoration: underline;">feelinghot.org</a>.</p>
+                
+                <!-- <div style="text-align: center; margin: 3rem 0; clear: both;">
+                    <a href="#download" class="btn">Download the survey data</a>
+                </div> -->
+
+                <div class="subsection">
+                    <h3>Survey analysis</h3>
+                    <p>Feelin’ Hot developed three different surveys for the project, in which variations of questions regarding the impact of heat at home, work and school related to distinct participant populations. Composed of open-ended questions, the surveys allowed respondents to provide an unlimited number of answers and did not require respondents to answer every question in order to be included. A local surveyor conducted the interviews, in both one-on-one and group settings, and, with participants’ consent, recorded their responses. Over the course of 45 interviews, a total of 54 people participated.</p>
+                    <div class="viz-container">
+                        <img src="assets/images/speakerviz.png" alt="Speaker visualization">
+                        <p class="viz-caption">Visualization of a group interview used to distinguish distinct survey responses</p>
+                    </div>
+                    <p>A data analyst transformed the surveyor’s notes on participants' responses into codes, and then referenced the audio files of each interview to validate the data. Using the Python programming language: The audio files were transcribed and analyzed for symptoms of heat stress. Group interviews were diarized to extract distinct survey responses. Participants' locations and group type were analyzed and visualized. With the exception of a single, sentiment-related question, each set of responses to each survey question were analyzed by group type, count and percentage. A sentiment analysis, calibrated to challenges related to heat, was performed on the surveyor's notes on educators' descriptions of summertime teaching experiences. Pre-trained AI models were used to process the audio files and perform the sentiment analysis.</p>
+                </div>
+
+                <div style="text-align: center; margin: 3rem 0; clear: both;">
+                    <a href="#download" class="btn">Download the survey data</a>
+                </div>
+
+                <div class="subsection">
+                    <h3>Credits</h3>
+                    <div class="credits">
+                        <p>
+                            <strong>Survey data analysis & visualization:</strong> Sarah Macaraeg<br>
+                            <strong>Site:</strong> Sarah Macaraeg<br>
+                            <strong>Surveyor:</strong> Tracey Edwards<br>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="subsection" style="margin-top: 4rem; padding-top: 3rem; border-top: 1px solid rgba(0,0,0,0.1);">
+                    <h4 style="font-size: 14px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-light); margin-bottom: 1.5rem;">Photo Credits</h4>
+                    <div style="font-size: 14px; line-height: 1.8; color: var(--text-gray);">
+                        <p><strong>Sunlight Through Palm Trees:</strong> Photo by Petr Kratochvil / Public Domain / <a href="https://www.publicdomainpictures.net/en/view-image.php?image=117731&picture=sunlight-through-palm-trees" target="_blank" style="color: var(--plasma-purple);">Public Domain Pictures</a></p>
+                        
+                        <p><strong>Fruit Stand in Clarendon:</strong> Photo by <a href="https://www.flickr.com/photos/44335492@N00/8450345640/" target="_blank" style="color: var(--plasma-purple);">Paul Asman and Jill Lenoble</a> / CC BY 2.0 / Flickr</p>
+                        
+                        <p><strong>Schoolchildren:</strong> Photo from <a href="https://pixnio.com/people/children-kids/schoolchildren-return-to-school#img_info" target="_blank" style="color: var(--plasma-purple);">Pixnio</a> / CC0 Public Domain</p>
+                        
+                        <!-- <p><strong>Primary school classroom:</strong> Photo by <a href="https://www.flickr.com/photos/9364473@N02/7435747040" target="_blank" style="color: var(--plasma-purple);">Jody Halsted</a> / CC BY-SA 2.0 / Flickr</p> -->
+                        
+                        <p><strong>Street Vendor:</strong> Photo by <a href="https://commons.wikimedia.org/wiki/File:Vendor_of_%22sky_juice%22_at_Savanna-la-Mar,_Jamaica_1989.jpg" target="_blank" style="color: var(--plasma-purple);">Wikimedia Commons</a> / Public Domain</p>
+                        
+                        <p><strong>Breadfruit Tree:</strong> Photo by George Chernilevsky / Public Domain / <a href="https://www.publicdomainpictures.net/en/free-download.php?image=breadfruit-plant&id=22369" target="_blank" style="color: var(--plasma-purple);">Public Domain Pictures</a></p>
+                        
+                        <!-- <p><strong>Clarendon construction:</strong> Photo by <a href="https://www.flickr.com/photos/86353974@N00/623748421" target="_blank" style="color: var(--plasma-purple);">Alan Levine</a> / CC BY 2.0 / Flickr</p> -->
+                        
+                        <p><strong>Street View:</strong> Photo by <a href="https://unsplash.com/photos/a-view-of-a-street-from-inside-a-vehicle-_M9HnOo04ec" target="_blank" style="color: var(--plasma-purple);">Rishikesh Yogpeeth</a> / Unsplash License / Unsplash</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // ==================== DEBUGGING HELPER ====================
+        window.logCarouselState = function() {
+            console.log('=== CAROUSEL STATE ===');
+            Object.entries(window._carousels || {}).forEach(([id, carousel]) => {
+                console.log(`  ${id}: Slide ${carousel.currentIndex + 1} of ${carousel.slides.length}`);
+            });
+        };
+
+        // ==================== BULLETPROOF CAROUSEL MANAGER ====================
+        class CarouselManager {
+            constructor(container, id) {
+                // Prevent double-initialization
+                if (container._carouselManager) {
+                    console.warn(`Carousel "${id}" was already initialized. Skipping.`);
+                    return;
+                }
+                
+                this.id = id;
+                this.container = container;
+                this.slides = container.querySelectorAll('.carousel-slide');
+                this.currentIndex = 0;
+                this.isTransitioning = false;
+                
+                // Store reference immediately
+                container._carouselManager = this;
+                
+                // Find buttons
+                this.prevBtn = container.querySelector('.carousel-arrow.prev');
+                this.nextBtn = container.querySelector('.carousel-arrow.next');
+                
+                // Clear any existing onclick handlers
+                if (this.prevBtn) this.prevBtn.onclick = null;
+                if (this.nextBtn) this.nextBtn.onclick = null;
+                
+                this.init();
+                
+                console.log(`🎠 Carousel "${this.id}" initialized: ${this.slides.length} slides`);
+            }
+            
+            init() {
+                // Show first slide without animation
+                this.goTo(0, false);
+                
+                // Bind arrow clicks with error handling
+                this.bindArrows();
+                
+                // Store in global registry for external access
+                window._carousels = window._carousels || {};
+                window._carousels[this.id] = this;
+            }
+            
+            bindArrows() {
+                // Define handler with arrow function to preserve scope
+                const handleClick = (e) => {
+                    e.stopPropagation();
+                    
+                    const btn = e.currentTarget;
+                    const direction = parseInt(btn.getAttribute('data-direction'), 10);
+                    
+                    if (isNaN(direction)) {
+                        console.error(`Invalid direction on carousel "${this.id}" button`);
+                        return;
+                    }
+                    
+                    console.log(`➡️ Carousel "${this.id}": ${direction > 0 ? 'Next' : 'Prev'} clicked (current: ${this.currentIndex + 1})`);
+                    this.goTo(this.currentIndex + direction);
+                };
+                
+                // Attach listeners with { once: false } to ensure they stay active
+                if (this.prevBtn) {
+                    this.prevBtn.removeEventListener('click', handleClick);
+                    this.prevBtn.addEventListener('click', handleClick, false);
+                }
+                
+                if (this.nextBtn) {
+                    this.nextBtn.removeEventListener('click', handleClick);
+                    this.nextBtn.addEventListener('click', handleClick, false);
+                }
+            }
+            
+            next() {
+                console.log(`➡️ Carousel "${this.id}": Next requested`);
+                this.goTo(this.currentIndex + 1);
+            }
+            
+            prev() {
+                console.log(`⬅️ Carousel "${this.id}": Prev requested`);
+                this.goTo(this.currentIndex - 1);
+            }
+            
+            goTo(index, animate = true) {
+                // Prevent rapid clicks
+                if (this.isTransitioning) {
+                    console.log(`⏳ Carousel "${this.id}": Transition in progress, ignoring request`);
+                    return;
+                }
+                
+                // Calculate wrapped index (handles negative numbers)
+                const wrappedIndex = (index + this.slides.length) % this.slides.length;
+                
+                // Exit if same slide
+                if (wrappedIndex === this.currentIndex) {
+                    console.log(`ℹ️ Carousel "${this.id}": Already on slide ${wrappedIndex + 1}`);
+                    return;
+                }
+                
+                this.isTransitioning = true;
+                
+                // Hide current slide
+                const currentSlide = this.slides[this.currentIndex];
+                if (currentSlide) {
+                    currentSlide.classList.remove('active');
+                    console.log(`🎬 Carousel "${this.id}": Removed active from slide ${this.currentIndex + 1}`);
+                }
+                
+                // Show new slide
+                this.currentIndex = wrappedIndex;
+                const nextSlide = this.slides[this.currentIndex];
+                if (nextSlide) {
+                    // Force reflow for consistent animation
+                    if (animate) {
+                        nextSlide.offsetHeight; // Trigger reflow
+                    }
+                    nextSlide.classList.add('active');
+                    console.log(`🎬 Carousel "${this.id}": Added active to slide ${this.currentIndex + 1}`);
+                }
+                
+                // End transition
+                setTimeout(() => {
+                    this.isTransitioning = false;
+                    console.log(`✅ Carousel "${this.id}": Now on slide ${this.currentIndex + 1}`);
+                }, animate ? 500 : 0);
+            }
+        }
+
+        // ==================== DOM READY INITIALIZATION ====================
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Initializing carousels...');
+            
+            // Clear any existing state
+            window._carousels = {};
+            
+            // Initialize all carousels
+            document.querySelectorAll('.carousel-container').forEach((container, i) => {
+                const id = container.getAttribute('data-carousel') || `carousel-${i}`;
+                
+                // Clear old manager if exists
+                if (container._carouselManager) {
+                    delete container._carouselManager;
+                }
+                
+                new CarouselManager(container, id);
+            });
+            
+            console.log('✨ Carousel initialization complete');
+            window.logCarouselState();
+        });
+
+        // ==================== GLOBAL ACCESS FUNCTION ====================
+        window.changeSlide = function(direction, carouselId) {
+            console.log(`🌍 Global changeSlide called: direction=${direction}, id=${carouselId}`);
+            
+            const carousel = window._carousels?.[carouselId];
+            if (carousel) {
+                if (direction > 0) {
+                    carousel.next();
+                } else {
+                    carousel.prev();
+                }
+            } else {
+                console.error(`❌ Carousel "${carouselId}" not found in global registry`);
+                console.log('Available carousels:', Object.keys(window._carousels || {}));
+            }
+        };
+
+        // ==================== SMOOTH SCROLL NAVIGATION ====================
+        document.querySelectorAll('nav a').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    const navHeight = document.querySelector('nav').offsetHeight;
+                    const targetPosition = target.offsetTop - navHeight - 20;
+                    window.scrollTo({
+                        top: targetPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // ==================== ACTIVE NAV HIGHLIGHTING ====================
+        const sections = document.querySelectorAll('section[id], div[id]');
+        const navLinks = document.querySelectorAll('nav a');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (window.pageYOffset >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // ==================== FADE IN ANIMATION ====================
+        const fadeElements = document.querySelectorAll('.fade-in');
+
+        const fadeObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        });
+
+        fadeElements.forEach(element => {
+            fadeObserver.observe(element);
+        });
+    </script>
+    
+    <!-- Scrollama Library -->
+    <script src="https://unpkg.com/scrollama"></script>
+    
+    <!-- PLOTLY VISUALIZATIONS -->
+
+    <!-- packed_circles-->
+    <script type="text/javascript">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("15e6166d-e58a-4915-b1b8-7d350759ede3")) {                    Plotly.newPlot(                        "15e6166d-e58a-4915-b1b8-7d350759ede3",                        [{"hoverinfo":"text","hovertext":"\u003cb\u003eAll\u003c\u002fb\u003e\u003cbr\u003eTotal respondents: 53","marker":{"color":"#eeeeee","line":{"color":"white","width":1},"size":859.9999999999999},"mode":"markers","showlegend":false,"x":[0.0],"y":[0.0],"type":"scatter"},{"hoverinfo":"text","hovertext":"\u003cb\u003eCaregivers\u003c\u002fb\u003e\u003cbr\u003eTotal respondents: 2","legendgroup":"Caregivers","marker":{"color":"#fcd225","line":{"color":"white","width":1},"size":138.3092925889868},"mode":"markers","name":"Caregivers","showlegend":true,"x":[-257.56321390929196],"y":[-169.90065840990533],"type":"scatter"},{"hoverinfo":"text","hovertext":"\u003cb\u003eCoaches\u003c\u002fb\u003e\u003cbr\u003eTotal respondents: 3","legendgroup":"Coaches","marker":{"color":"#f78410","line":{"color":"white","width":1},"size":169.3935967641603},"mode":"markers","name":"Coaches","showlegend":true,"x":[-265.5829462156283],"y":[190.93082583434662],"type":"scatter"},{"hoverinfo":"text","hovertext":"\u003cb\u003eOutdoor Workers\u003c\u002fb\u003e\u003cbr\u003eTotal respondents: 5","legendgroup":"Outdoor Workers","marker":{"color":"#a62098","line":{"color":"white","width":1},"size":218.68619307392248},"mode":"markers","name":"Outdoor Workers","showlegend":true,"x":[-336.68974863619064],"y":[0.0],"type":"scatter"},{"hoverinfo":"text","hovertext":"\u003cb\u003eTeachers\u003c\u002fb\u003e\u003cbr\u003eTotal respondents: 43","legendgroup":"Teachers","marker":{"color":"#3e049c","line":{"color":"white","width":1},"size":641.3138069260774},"mode":"markers","name":"Teachers","showlegend":true,"x":[114.81025136380931],"y":[0.0],"type":"scatter"},{"hoverinfo":"text","hovertext":"\u003cb\u003emood changes\u003c\u002fb\u003e\u003cbr\u003eGroup: Caregivers\u003cbr\u003eRespondents: 1\u003cbr\u003ePercent of group: 50.0%","legendgroup":"Caregivers","marker":{"color":"#feeda8","line":{"color":"white","width":1},"size":55.38473451378593},"mode":"markers+text","showlegend":false,"text":"mood\u003cbr\u003echanges","textfont":{"color":"black","size":10},"textposition":"middle center","x":[-297.12064266809136],"y":[-182.3236376413276],"type":"scatter"},{"hoverinfo":"text","hovertext":"\u003cb\u003ephysical discomfort\u003c\u002fb\u003e\u003cbr\u003eGroup: Caregivers\u003cbr\u003eRespondents: 1\u003cbr\u003ePercent of group: 50.0%","legendgroup":"Caregivers","marker":{"color":"#feeda8","line":{"color":"white","width":1},"size":55.38473451378593},"mode":"markers+text","showlegend":false,"text":"physical\u003cbr\u003ediscomfort","textfont":{"color":"black","size":10},"textposition":"middle center","x":[-274.1795344840481],"y":[-131.91357542701786],"type":"scatter"},{"hoverinfo":"text","hovertext":"\u003cb\u003eharder to work\u003c\u002fb\u003e\u003cbr\u003eGroup: Caregivers\u003cbr\u003eRespondents: 2\u003cbr\u003ePercent of group: 100.0%","legendgroup":"Caregivers","marker":{"color":"#feeda8","line":{"color":"white","width":1},"size":78.32584269782932},"mode":"markers+text","showlegend":false,"text":"harder\u003cbr\u003eto\u003cbr\u003ework","textfont":{"color":"black","size":10},"textposition":"middle center","x":[-230.2653540622838],"y":[-182.3236376413276],"type":"scatter"},{"hoverinfo":"text","hovertext":"\u003cb\u003eincreased breaks\u003c\u002fb\u003e\u003cbr\u003eGroup: Coaches\u003cbr\u003eRespondents: 3\u003cbr\u003ePercent of group: 100.0%","legendgroup":"Coaches","marker":{"color":"#fcce9f","line":{"color":"white","width":1},"size":84.69679838208015},"mode":"markers+text","showlegend":false,"text":"increased\u003cbr\u003ebreaks","textfont":{"color":"black","size":10},"textposition":"middle center","x":[-223.2345470245882],"y":[190.93082583434662],"type":"scatter"},{"hoverinfo":"text","hovertext":"\u003cb\u003eharder to work\u003c\u002fb\u003e\u003cbr\u003eGroup: Coaches\u003cbr\u003eRespondents: 3\u003cbr\u003ePercent of group: 100.0%","legendgroup":"Coaches","marker":{"color":"#fcce9f","line":{"color":"white","width":1},"size":84.69679838208015},"mode":"markers+text","showlegend":false,"text":"harder\u003cbr\u003eto\u003cbr\u003ework","textfont":{"color":"black","size":10},"textposition":"middle center","x":[-307.93134540666836],"y":[190.93082583434662],"type":"scatter"},{"hoverinfo":"text","hovertext":"\u003cb\u003enone\u003c\u002fb\u003e\u003cbr\u003eGroup: Outdoor Workers\u003cbr\u003eRespondents: 1\u003cbr\u003ePercent of group: 20.0%","legendgroup":"Outdoor Workers","marker":{"color":"#dba6d6","line":{"color":"white","width":1},"size":71.82247761295855},"mode":"markers+text","showlegend":false,"text":"none","textfont":{"color":"black","size":10},"textposition":"middle center","x":[-409.0486862883237],"y":[-12.506872974667669],"type":"scatter"},{"hoverinfo":"text","hovertext":"\u003cb\u003elightheaded\u003c\u002fb\u003e\u003cbr\u003eGroup: Outdoor Workers\u003cbr\u003eRespondents: 1\u003cbr\u003ePercent of group: 20.0%","legendgroup":"Outdoor Workers","marker":{"color":"#dba6d6","line":{"color":"white","width":1},"size":71.82247761295855},"mode":"markers+text","showlegend":false,"text":"lightheaded","textfont":{"color":"black","size":10},"textposition":"middle center","x":[-385.1078604173375],"y":[55.208008307655085],"type":"scatter"},{"hoverinfo":"text","hovertext":"\u003cb\u003eharder to work\u003c\u002fb\u003e\u003cbr\u003eGroup: Outdoor Workers\u003cbr\u003eRespondents: 4\u003cbr\u003ePercent of group: 80.0%","legendgroup":"Outdoor Workers","marker":{"color":"#dba6d6","line":{"color":"white","width":1},"size":143.6449552259171},"mode":"markers+text","showlegend":false,"text":"harder\u003cbr\u003eto\u003cbr\u003ework","textfont":{"color":"black","size":10},"textposition":"middle center","x":[-301.31496986888584],"y":[-12.506872974667669],"type":"scatter"},{"hoverinfo":"text","hovertext":"\u003cb\u003eincreased breaks\u003c\u002fb\u003e\u003cbr\u003eGroup: Teachers\u003cbr\u003eRespondents: 1\u003cbr\u003ePercent of group: 2.3%","legendgroup":"Teachers","marker":{"color":"#b29bd7","line":{"color":"white","width":1},"size":66.49691200826759},"mode":"markers+text","showlegend":false,"text":"increased\u003cbr\u003ebreaks","textfont":{"color":"black","size":10},"textposition":"middle center","x":[-98.70863642141845],"y":[175.63612726216172],"type":"scatter"},{"hoverinfo":"text","hovertext":"\u003cb\u003ephysical discomfort\u003c\u002fb\u003e\u003cbr\u003eGroup: Teachers\u003cbr\u003eRespondents: 2\u003cbr\u003ePercent of group: 4.7%","legendgroup":"Teachers","marker":{"color":"#b29bd7","line":{"color":"white","width":1},"size":94.04083481802236},"mode":"markers+text","showlegend":false,"text":"physical\u003cbr\u003ediscomfort","textfont":{"color":"black","size":10},"textposition":"middle center","x":[186.5081850236449],"y":[208.83410732919464],"type":"scatter"},{"hoverinfo":"text","hovertext":"\u003cb\u003enone\u003c\u002fb\u003e\u003cbr\u003eGroup: Teachers\u003cbr\u003eRespondents: 3\u003cbr\u003ePercent of group: 7.0%","legendgroup":"Teachers","marker":{"color":"#b29bd7","line":{"color":"white","width":1},"size":115.17603014475644},"mode":"markers+text","showlegend":false,"text":"none","textfont":{"color":"black","size":10},"textposition":"middle center","x":[85.17214702430216],"y":[182.87391571185157],"type":"scatter"},{"hoverinfo":"text","hovertext":"\u003cb\u003efeeling tired\u003c\u002fb\u003e\u003cbr\u003eGroup: Teachers\u003cbr\u003eRespondents: 3\u003cbr\u003ePercent of group: 7.0%","legendgroup":"Teachers","marker":{"color":"#b29bd7","line":{"color":"white","width":1},"size":115.17603014475644},"mode":"markers+text","showlegend":false,"text":"feeling\u003cbr\u003etired","textfont":{"color":"black","size":10},"textposition":"middle center","x":[-131.97710668178144],"y":[91.11114063590216],"type":"scatter"},{"hoverinfo":"text","hovertext":"\u003cb\u003emood changes\u003c\u002fb\u003e\u003cbr\u003eGroup: Teachers\u003cbr\u003eRespondents: 3\u003cbr\u003ePercent of group: 7.0%","legendgroup":"Teachers","marker":{"color":"#b29bd7","line":{"color":"white","width":1},"size":115.17603014475644},"mode":"markers+text","showlegend":false,"text":"mood\u003cbr\u003echanges","textfont":{"color":"black","size":10},"textposition":"middle center","x":[-22.18689210460988],"y":[224.5818842217491],"type":"scatter"},{"hoverinfo":"text","hovertext":"\u003cb\u003ereduced productivity\u003c\u002fb\u003e\u003cbr\u003eGroup: Teachers\u003cbr\u003eRespondents: 4\u003cbr\u003ePercent of group: 9.3%","legendgroup":"Teachers","marker":{"color":"#b29bd7","line":{"color":"white","width":1},"size":132.99382401653517},"mode":"markers+text","showlegend":false,"text":"reduced\u003cbr\u003eproductivity","textfont":{"color":"black","size":10},"textposition":"middle center","x":[-8.309180084678722],"y":[101.27544384777234],"type":"scatter"},{"hoverinfo":"text","hovertext":"\u003cb\u003edemotivating\u003c\u002fb\u003e\u003cbr\u003eGroup: Teachers\u003cbr\u003eRespondents: 4\u003cbr\u003ePercent of group: 9.3%","legendgroup":"Teachers","marker":{"color":"#b29bd7","line":{"color":"white","width":1},"size":132.99382401653517},"mode":"markers+text","showlegend":false,"text":"demotivating","textfont":{"color":"black","size":10},"textposition":"middle center","x":[-8.309180084678722],"y":[-182.18926074695423],"type":"scatter"},{"hoverinfo":"text","hovertext":"\u003cb\u003epre-existing conditions worsened\u003c\u002fb\u003e\u003cbr\u003eGroup: Teachers\u003cbr\u003eRespondents: 7\u003cbr\u003ePercent of group: 16.3%","legendgroup":"Teachers","marker":{"color":"#b29bd7","line":{"color":"white","width":1},"size":175.9342921276207},"mode":"markers+text","showlegend":false,"text":"pre-existing\u003cbr\u003econditions\u003cbr\u003eworsened","textfont":{"color":"black","size":10},"textposition":"middle center","x":[-69.71834510383859],"y":[-40.45690844959095],"type":"scatter"},{"hoverinfo":"text","hovertext":"\u003cb\u003eharder to work\u003c\u002fb\u003e\u003cbr\u003eGroup: Teachers\u003cbr\u003eRespondents: 38\u003cbr\u003ePercent of group: 88.4%","legendgroup":"Teachers","marker":{"color":"#b29bd7","line":{"color":"white","width":1},"size":409.91449553796053},"mode":"markers+text","showlegend":false,"text":"harder\u003cbr\u003eto\u003cbr\u003ework","textfont":{"color":"black","size":10},"textposition":"middle center","x":[223.206048728952],"y":[-40.45690844959095],"type":"scatter"}],                        {"template":{"layout":{"colorway":["#fcd225","#f78410","#a62098","#3e049c"],"font":{"family":"'Space Grotesk', 'Inter', sans-serif","size":12}}},"title":{"text":"Is heat impacting your job or making it more difficult\u002feasier?","font":{"size":18}},"xaxis":{"range":[-510.0,510.0],"showgrid":false,"zeroline":false,"visible":false},"yaxis":{"range":[-510.0,510.0],"showgrid":false,"zeroline":false,"visible":false},"margin":{"t":60,"b":20,"l":20,"r":20},"legend":{"title":{"text":"  Vulnerable Group"},"yanchor":"top","y":0.99,"xanchor":"left","x":0.01,"itemsizing":"constant","tracegroupgap":5},"width":1020,"height":1020,"paper_bgcolor":"white","plot_bgcolor":"white"},                        {"responsive": true}                    )                };                            </script>
+    <!-- educator_conditions -->
+    <script type="text/javascript">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("228b963d-b99b-42f8-b59d-3d2b23a0a0e4")) {                    Plotly.newPlot(                        "228b963d-b99b-42f8-b59d-3d2b23a0a0e4",                        [{"customdata":["\u003cb\u003eTeachers\u003c\u002fb\u003e\u003cbr\u003eAC\u003cbr\u003eCount: 3\u003cbr\u003ePercentage: 2.6%","\u003cb\u003eTeachers\u003c\u002fb\u003e\u003cbr\u003eFan(s)\u003cbr\u003eCount: 40\u003cbr\u003ePercentage: 34.8%","\u003cb\u003eTeachers\u003c\u002fb\u003e\u003cbr\u003eTrees\u003cbr\u003eCount: 18\u003cbr\u003ePercentage: 15.7%","\u003cb\u003eTeachers\u003c\u002fb\u003e\u003cbr\u003eLittle\u002fno trees\u003cbr\u003eCount: 19\u003cbr\u003ePercentage: 16.5%","\u003cb\u003eTeachers\u003c\u002fb\u003e\u003cbr\u003eHeat-trapping materials\u003cbr\u003eCount: 29\u003cbr\u003ePercentage: 25.2%\u003cbr\u003e\u003cbr\u003econcrete: 7\u003cbr\u003egravel: 1\u003cbr\u003easphalt: 14\u003cbr\u003ezinc roof: 5\u003cbr\u003ealuminum: 2","\u003cb\u003eTeachers\u003c\u002fb\u003e\u003cbr\u003eCrowded\u003cbr\u003eCount: 6\u003cbr\u003ePercentage: 5.2%"],"hovertemplate":"%{customdata}\u003cextra\u003e\u003c\u002fextra\u003e","marker":{"color":"#3e049c"},"name":"Teachers","text":["3","40","18","19","29","6"],"textfont":{"color":"white","size":11},"textposition":"inside","x":["AC","Fan(s)","Trees","Little\u002fno trees","Heat-trapping materials","Crowded"],"y":[3,40,18,19,29,6],"type":"bar"},{"customdata":["\u003cb\u003eCoaches\u003c\u002fb\u003e\u003cbr\u003eAC\u003cbr\u003eCount: 1\u003cbr\u003ePercentage: 20.0%","\u003cb\u003eCoaches\u003c\u002fb\u003e\u003cbr\u003eFan(s)\u003cbr\u003eCount: 1\u003cbr\u003ePercentage: 20.0%","\u003cb\u003eCoaches\u003c\u002fb\u003e\u003cbr\u003eTrees\u003cbr\u003eCount: 0\u003cbr\u003ePercentage: 0.0%","\u003cb\u003eCoaches\u003c\u002fb\u003e\u003cbr\u003eLittle\u002fno trees\u003cbr\u003eCount: 3\u003cbr\u003ePercentage: 60.0%","\u003cb\u003eCoaches\u003c\u002fb\u003e\u003cbr\u003eHeat-trapping materials\u003cbr\u003eCount: 0\u003cbr\u003ePercentage: 0.0%\u003cbr\u003e\u003cbr\u003eNone","\u003cb\u003eCoaches\u003c\u002fb\u003e\u003cbr\u003eCrowded\u003cbr\u003eCount: 0\u003cbr\u003ePercentage: 0.0%"],"hovertemplate":"%{customdata}\u003cextra\u003e\u003c\u002fextra\u003e","marker":{"color":"#f78410"},"name":"Coaches","text":["1","1","0","3","0","0"],"textfont":{"color":"white","size":11},"textposition":"inside","x":["AC","Fan(s)","Trees","Little\u002fno trees","Heat-trapping materials","Crowded"],"y":[1,1,0,3,0,0],"type":"bar"}],                        {"template":{"layout":{"colorway":["#fcd225","#f78410","#a62098","#3e049c"],"font":{"family":"'Space Grotesk', 'Inter', sans-serif","size":12}}},"title":{"font":{"size":18},"text":"What are the teaching conditions as it relates to cooling\u002fheating?","x":0.5,"xanchor":"center"},"xaxis":{"title":{"font":{"size":14},"text":"Teaching conditions","standoff":30},"tickfont":{"size":12},"categoryorder":"array","categoryarray":["AC","Fan(s)","Trees","Little\u002fno trees","Heat-trapping materials","Crowded"]},"yaxis":{"title":{"text":"Number of responses"},"showgrid":true,"gridcolor":"#e5e5e5"},"legend":{"font":{"size":12},"x":0.98,"y":0.98,"xanchor":"right","yanchor":"top","orientation":"v","bgcolor":"rgba(255, 255, 255, 0.8)","bordercolor":"#999999","borderwidth":1},"margin":{"l":80,"r":80,"t":100,"b":120},"barmode":"stack","plot_bgcolor":"white","height":500,"width":1000},                        {"responsive": true}                    )                };                            </script>
+<!-- outdoor_worker_perceptions -->
+    <script type="text/javascript">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("b3ce76e1-0f65-43a9-90c3-43cc70e07849")) {                    Plotly.newPlot(                        "b3ce76e1-0f65-43a9-90c3-43cc70e07849",                        [{"hole":0.6,"hoverinfo":"text","hovertext":["\u003cb\u003esleep issues\u003c\u002fb\u003e\u003cbr\u003ePercentage: 100%\u003cbr\u003e"],"labels":["sleep issues"],"marker":{"colors":["#0d0887"],"line":{"color":"white","width":2}},"showlegend":false,"text":["100%"],"textfont":{"color":"#dddddd","family":"Space Grotesk","size":11},"textinfo":"label+text","textposition":"auto","values":[100.0],"type":"pie","domain":{"x":[0.0,0.5],"y":[0.72,1.0]}},{"hole":0.6,"hoverinfo":"text","hovertext":["\u003cb\u003efeeling tired\u003c\u002fb\u003e\u003cbr\u003ePercentage: 40%\u003cbr\u003e","\u003cb\u003ephysical discomfort\u003c\u002fb\u003e\u003cbr\u003ePercentage: 40%\u003cbr\u003e","\u003cb\u003epre-existing conditions worsened\u003c\u002fb\u003e\u003cbr\u003ePercentage: 20%\u003cbr\u003e"],"labels":["feeling tired","physical discomfort","pre-existing conditions worsened"],"marker":{"colors":["#0d0887","#46039f","#7201a8"],"line":{"color":"white","width":2}},"showlegend":false,"text":["40%","40%","20%"],"textfont":{"color":"#dddddd","family":"Space Grotesk","size":11},"textinfo":"label+text","textposition":"auto","values":[40.0,40.0,20.0],"type":"pie","domain":{"x":[0.5,1.0],"y":[0.72,1.0]}},{"hole":0.6,"hoverinfo":"text","hovertext":["\u003cb\u003ehydration\u003c\u002fb\u003e\u003cbr\u003ePercentage: 29%\u003cbr\u003e","\u003cb\u003eopen windows\u003c\u002fb\u003e\u003cbr\u003ePercentage: 29%\u003cbr\u003e","\u003cb\u003euse of fans\u003c\u002fb\u003e\u003cbr\u003ePercentage: 29%\u003cbr\u003e","\u003cb\u003euse of ac\u003c\u002fb\u003e\u003cbr\u003ePercentage: 14%\u003cbr\u003e"],"labels":["hydration","open windows","use of fans","use of ac"],"marker":{"colors":["#0d0887","#46039f","#7201a8","#9c179e"],"line":{"color":"white","width":2}},"showlegend":false,"text":["29%","29%","29%","14%"],"textfont":{"color":"#dddddd","family":"sans-serif","size":11},"textinfo":"label+text","textposition":"auto","values":[28.57142857142857,28.57142857142857,28.57142857142857,14.285714285714285],"type":"pie","domain":{"x":[0.0,0.5],"y":[0.36,0.6399999999999999]}},{"hole":0.6,"hoverinfo":"text","hovertext":["\u003cb\u003eadjusting activities\u003c\u002fb\u003e\u003cbr\u003ePercentage: 20%\u003cbr\u003e","\u003cb\u003eclothing adjustments\u003c\u002fb\u003e\u003cbr\u003ePercentage: 20%\u003cbr\u003e","\u003cb\u003estaying indoors\u003c\u002fb\u003e\u003cbr\u003ePercentage: 20%\u003cbr\u003e","\u003cb\u003euse of ac\u003c\u002fb\u003e\u003cbr\u003ePercentage: 20%\u003cbr\u003e","\u003cb\u003euse of fans\u003c\u002fb\u003e\u003cbr\u003ePercentage: 20%\u003cbr\u003e"],"labels":["adjusting activities","clothing adjustments","staying indoors","use of ac","use of fans"],"marker":{"colors":["#0d0887","#46039f","#7201a8","#9c179e","#bd3786"],"line":{"color":"white","width":2}},"showlegend":false,"text":["20%","20%","20%","20%","20%"],"textfont":{"color":"#dddddd","family":"Space Grotesk","size":11},"textinfo":"label+text","textposition":"auto","values":[20.0,20.0,20.0,20.0,20.0],"type":"pie","domain":{"x":[0.5,1.0],"y":[0.36,0.6399999999999999]}},{"hole":0.6,"hoverinfo":"text","hovertext":["\u003cb\u003ehydration\u003c\u002fb\u003e\u003cbr\u003ePercentage: 29%\u003cbr\u003e","\u003cb\u003estaying indoors\u003c\u002fb\u003e\u003cbr\u003ePercentage: 29%\u003cbr\u003e","\u003cb\u003eadjusting activities\u003c\u002fb\u003e\u003cbr\u003ePercentage: 14%\u003cbr\u003e","\u003cb\u003enone\u003c\u002fb\u003e\u003cbr\u003ePercentage: 14%\u003cbr\u003e","\u003cb\u003ewalking faster\u003c\u002fb\u003e\u003cbr\u003ePercentage: 14%\u003cbr\u003e"],"labels":["hydration","staying indoors","adjusting activities","none","walking faster"],"marker":{"colors":["#0d0887","#46039f","#7201a8","#9c179e","#bd3786"],"line":{"color":"white","width":2}},"showlegend":false,"text":["29%","29%","14%","14%","14%"],"textfont":{"color":"#dddddd","family":"sans-serif","size":11},"textinfo":"label+text","textposition":"auto","values":[28.57142857142857,28.57142857142857,14.285714285714285,14.285714285714285,14.285714285714285],"type":"pie","domain":{"x":[0.0,0.5],"y":[0.0,0.27999999999999997]}},{"hole":0.6,"hoverinfo":"text","hovertext":["\u003cb\u003ecar, ac unknown\u003c\u002fb\u003e\u003cbr\u003ePercentage: 75%\u003cbr\u003e","\u003cb\u003eac car via taxi\u003c\u002fb\u003e\u003cbr\u003ePercentage: 25%\u003cbr\u003e"],"labels":["car, ac unknown","ac car via taxi"],"marker":{"colors":["#0d0887","#46039f"],"line":{"color":"white","width":2}},"showlegend":false,"text":["75%","25%"],"textfont":{"color":"#dddddd","family":"Space Grotesk","size":11},"textinfo":"label+text","textposition":"auto","values":[75.0,25.0],"type":"pie","domain":{"x":[0.5,1.0],"y":[0.0,0.27999999999999997]}}],                        {"template":{"layout":{"colorway":["#fcd225","#f78410","#a62098","#3e049c"],"font":{"family":"'Space Grotesk', 'Inter', sans-serif","size":12}}},"annotations":[{"font":{"color":"#777777","family":"Space Grotesk","size":12,"weight":"normal"},"showarrow":false,"text":"\u003cb\u003en = 5\u003c\u002fb\u003e\u003cbr\u003etotal responses = 5","x":0.25,"xanchor":"center","xref":"paper","y":0.86,"yanchor":"middle","yref":"paper"},{"font":{"color":"#333333","family":"Space Grotesk","size":18},"showarrow":false,"text":"\u003cb\u003eHow is heat affecting your ability to\u003cbr\u003esleep?\u003c\u002fb\u003e","x":0.25,"xanchor":"center","xref":"paper","y":0.71,"yanchor":"top","yref":"paper"},{"font":{"color":"#777777","family":"Space Grotesk","size":12,"weight":"normal"},"showarrow":false,"text":"\u003cb\u003en = 5\u003c\u002fb\u003e\u003cbr\u003etotal responses = 5","x":0.75,"xanchor":"center","xref":"paper","y":0.86,"yanchor":"middle","yref":"paper"},{"font":{"color":"#333333","family":"Space Grotesk","size":18},"showarrow":false,"text":"\u003cb\u003eIs heat impacting you or your familys\u003cbr\u003ehealth?\u003c\u002fb\u003e","x":0.75,"xanchor":"center","xref":"paper","y":0.71,"yanchor":"top","yref":"paper"},{"font":{"color":"#777777","family":"Space Grotesk","size":12,"weight":"normal"},"showarrow":false,"text":"\u003cb\u003en = 3\u003c\u002fb\u003e\u003cbr\u003etotal responses = 7","x":0.25,"xanchor":"center","xref":"paper","y":0.5,"yanchor":"middle","yref":"paper"},{"font":{"color":"#333333","family":"Space Grotesk","size":18},"showarrow":false,"text":"\u003cb\u003eWhat are you doing to reduce the impact\u003cbr\u003eof heat at home?\u003c\u002fb\u003e","x":0.25,"xanchor":"center","xref":"paper","y":0.35,"yanchor":"top","yref":"paper"},{"font":{"color":"#777777","family":"sans-serif","size":12,"weight":"normal"},"showarrow":false,"text":"\u003cb\u003en = 4\u003c\u002fb\u003e\u003cbr\u003etotal responses = 5","x":0.75,"xanchor":"center","xref":"paper","y":0.5,"yanchor":"middle","yref":"paper"},{"font":{"color":"#333333","family":"Space Grotesk","size":18},"showarrow":false,"text":"\u003cb\u003eWhat are you doing to reduce the impact\u003cbr\u003eof heat while traveling?\u003c\u002fb\u003e","x":0.75,"xanchor":"center","xref":"paper","y":0.35,"yanchor":"top","yref":"paper"},{"font":{"color":"#777777","family":"Space Grotesk","size":12,"weight":"normal"},"showarrow":false,"text":"\u003cb\u003en = 5\u003c\u002fb\u003e\u003cbr\u003etotal responses = 7","x":0.25,"xanchor":"center","xref":"paper","y":0.13,"yanchor":"middle","yref":"paper"},{"font":{"color":"#333333","family":"Space Grotesk","size":18},"showarrow":false,"text":"\u003cb\u003eDoes heat affect you while walking\u003cbr\u003earound the city?\u003c\u002fb\u003e","x":0.25,"xanchor":"center","xref":"paper","y":0.005,"yanchor":"top","yref":"paper"},{"font":{"color":"#777777","family":"Space Grotesk","size":12,"weight":"normal"},"showarrow":false,"text":"\u003cb\u003en = 4\u003c\u002fb\u003e\u003cbr\u003etotal responses = 4","x":0.75,"xanchor":"center","xref":"paper","y":0.13,"yanchor":"middle","yref":"paper"},{"font":{"color":"#333333","family":"Space Grotesk","size":18},"showarrow":false,"text":"\u003cb\u003eDo you travel by bus, taxi, walk or\u003cbr\u003edrive your own car?\u003c\u002fb\u003e","x":0.75,"xanchor":"center","xref":"paper","y":0.005,"yanchor":"top","yref":"paper"}],"title":{"font":{"size":22,"family":"Space Grotesk"},"text":"Heat-impact perceptions among outdoor workers","x":0.5,"y":0.98,"xanchor":"center","yanchor":"top"},"margin":{"t":80,"b":40,"l":10,"r":10},"height":1420,"width":1080,"showlegend":false,"paper_bgcolor":"white"},                        {"responsive": true}                    )                };                            </script>
+
+    <!-- solutions_beeswarm-->
+    <script type="text/javascript">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("2fa87fe5-cd81-4a1f-a600-28ca1935f216")) {                    Plotly.newPlot(                        "2fa87fe5-cd81-4a1f-a600-28ca1935f216",                        [{"alignmentgroup":"True","boxpoints":"all","customdata":[["ac"],["green space"],["fans"],["green space"]],"fillcolor":"rgba(255,255,255,0)","hoveron":"points","hovertemplate":"\u003cb\u003eVulnerable group:\u003c\u002fb\u003e %{x}\u003cbr\u003e\u003cb\u003eSuggested change:\u003c\u002fb\u003e %{customdata[0]}\u003cbr\u003e\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Caregivers","line":{"color":"rgba(255,255,255,0)"},"marker":{"color":"#fcd225","size":12,"opacity":0.5,"line":{"width":1.0,"color":"white"}},"name":"Caregivers","offsetgroup":"Caregivers","orientation":"v","pointpos":0,"showlegend":true,"x":["Caregivers","Caregivers","Caregivers","Caregivers"],"x0":" ","xaxis":"x","y":[21.06574945165343,9.985330825540492,14.086063500778732,10.047368326974247],"y0":" ","yaxis":"y","type":"box"},{"alignmentgroup":"True","boxpoints":"all","customdata":[["shade shelter"],["ac"],["government action"],["global action"],["education"],["education"],["shade shelter"],["fans"],["ac"],["shortened school days"]],"fillcolor":"rgba(255,255,255,0)","hoveron":"points","hovertemplate":"\u003cb\u003eVulnerable group:\u003c\u002fb\u003e %{x}\u003cbr\u003e\u003cb\u003eSuggested change:\u003c\u002fb\u003e %{customdata[0]}\u003cbr\u003e\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Coaches","line":{"color":"rgba(255,255,255,0)"},"marker":{"color":"#f78410","size":12,"opacity":0.5,"line":{"width":1.0,"color":"white"}},"name":"Coaches","offsetgroup":"Coaches","orientation":"v","pointpos":0,"showlegend":true,"x":["Coaches","Coaches","Coaches","Coaches","Coaches","Coaches","Coaches","Coaches","Coaches","Coaches"],"x0":" ","xaxis":"x","y":[5.902602563493036,21.114149364392823,12.062673528477685,13.06865543326647,14.910747271842132,14.988092625094936,5.968991525815819,14.102423597323664,21.034527628819358,5.0774627871849995],"y0":" ","yaxis":"y","type":"box"},{"alignmentgroup":"True","boxpoints":"all","customdata":[["cheaper electricity"],["shade shelter"],["none"],["ac"],["none"],["green space"],["cheaper electricity"],["preserve trees"],["cooling centers"],["preserve trees"],["green space"],["solar electricity"]],"fillcolor":"rgba(255,255,255,0)","hoveron":"points","hovertemplate":"\u003cb\u003eVulnerable group:\u003c\u002fb\u003e %{x}\u003cbr\u003e\u003cb\u003eSuggested change:\u003c\u002fb\u003e %{customdata[0]}\u003cbr\u003e\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Outdoor workers","line":{"color":"rgba(255,255,255,0)"},"marker":{"color":"#a62098","size":12,"opacity":0.5,"line":{"width":1.0,"color":"white"}},"name":"Outdoor workers","offsetgroup":"Outdoor workers","orientation":"v","pointpos":0,"showlegend":true,"x":["Outdoor workers","Outdoor workers","Outdoor workers","Outdoor workers","Outdoor workers","Outdoor workers","Outdoor workers","Outdoor workers","Outdoor workers","Outdoor workers","Outdoor workers","Outdoor workers"],"x0":" ","xaxis":"x","y":[18.98641940771856,5.934537293228346,9.0131003488838,20.895316141465003,9.07863148127822,10.031599455789296,19.06194105762049,7.965086232351168,17.112967525854778,8.094349069117328,10.066812039297703,1.9267132898844723],"y0":" ","yaxis":"y","type":"box"},{"alignmentgroup":"True","boxpoints":"all","customdata":[["government action"],["green space"],["preserve trees"],["green space"],["green space"],["cooling centers"],["ac"],["green space"],["ac"],["community action"],["solar electricity"],["ac"],["ac"],["fans"],["smart architecture"],["green space"],["fans"],["ac"],["fans"],["green space"],["fans"],["ac"],["fans"],["ac"],["depaving"],["government action on air pollution"],["renewable energy"],["green space"],["government action"],["fans"],["education"],["green space"],["ac"],["government action on air pollution"],["green space"],["ac"],["government action on air pollution"],["green space"],["green space"],["fans"],["ac"],["fans"],["green space"],["ac"],["solar electricity"],["fans"],["ac"],["fans"],["ac"],["fans"],["ac"],["smart architecture"],["fans"],["ac"],["smaller class sizes"],["access to water"],["ac"],["fans"],["fans"],["ac"],["preserve trees"],["education"],["smart architecture"],["access to water"],["fans"],["ac"],["smart architecture"],["smart architecture"],["none"],["none"],["fans"],["uniform changes"],["water use"],["fans"],["ac"],["shade shelter"],["green space"],["ac"],["ac"],["uniform changes"],["preserve trees"],["green space"],["fans"],["ac"],["fans"],["access to water"],["ac"],["fans"],["green space"],["fans"],["none"],["shade shelter"],["government action"],["access to water"]],"fillcolor":"rgba(255,255,255,0)","hoveron":"points","hovertemplate":"\u003cb\u003eVulnerable group:\u003c\u002fb\u003e %{x}\u003cbr\u003e\u003cb\u003eSuggested change:\u003c\u002fb\u003e %{customdata[0]}\u003cbr\u003e\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Teachers","line":{"color":"rgba(255,255,255,0)"},"marker":{"color":"#3e049c","size":12,"opacity":0.5,"line":{"width":1.0,"color":"white"}},"name":"Teachers","offsetgroup":"Teachers","orientation":"v","pointpos":0,"showlegend":true,"x":["Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers"],"x0":" ","xaxis":"x","y":[11.992013040894488,9.890512903788935,7.917029478096212,10.043931748778189,10.058742917417876,17.11220233578421,20.958198085953157,9.968910329448368,20.992693394706194,17.92547312618023,1.9111811612805132,20.994169182294225,20.934458243772212,14.040755358723802,2.984916460529359,10.079842767053881,14.04806362448054,20.95496799393169,14.079742352334849,10.073143445799232,13.972994810967242,20.94919874494326,14.043798920953995,20.913540596066234,15.927977968594027,10.88176694474024,7.068861850600514,10.039564205582087,12.049239690870321,14.067374967445271,14.990139786129202,10.016497887028695,20.91355127955064,10.907487217648633,10.040416710829714,20.99306308947435,11.015656665555486,10.063599725779847,10.032332396800141,14.01285905615792,21.0142097185789,13.952948023535027,9.887396280296306,20.98481217341577,1.931500321476687,13.978046874493913,21.08481673758436,13.936145476607681,20.893992658005377,13.947532134085279,20.950462501864003,3.038859963534455,14.013687716561908,21.06813557018554,4.039435249678573,19.977532846745618,21.075364892319847,13.92007350077785,13.885450897552127,20.901611486586155,8.053366244143149,14.990850535260334,2.9187052269680644,20.000250746024808,13.91655490465116,21.047116890018657,2.9870775061377675,2.9714450942631556,8.95236290139549,9.031267822348534,13.966835026532813,0.9010359806358642,-0.09167858349107633,14.110855439491884,21.098059365769824,6.04792971211458,9.943808790750285,21.112602330563455,21.06690021695179,1.0520536453981588,7.987846760514509,9.945337974842838,13.90313383091684,21.096624575170523,13.989386309560066,19.928567207550856,20.953429589796155,14.019012696546055,9.922425467905416,14.085587428182171,9.06204468716045,6.052671109428225,11.983702329546025,20.030554121768585],"y0":" ","yaxis":"y","type":"box"}],                        {"template":{"layout":{"colorway":["#fcd225","#f78410","#a62098","#3e049c"],"font":{"family":"'Space Grotesk', 'Inter', sans-serif","size":12}}},"xaxis":{"anchor":"y","domain":[0.0,1.0],"title":{"text":"Group","font":{"size":16,"color":"gray","family":"'Space Grotesk', sans-serif"},"standoff":20},"categoryorder":"array","categoryarray":["Caregivers","Coaches","Outdoor workers","Teachers"],"tickfont":{"size":12,"family":"'Space Grotesk', sans-serif"},"tickangle":45,"automargin":true,"zeroline":true},"yaxis":{"anchor":"x","domain":[0.0,1.0],"title":{"text":"Solution","font":{"size":16,"color":"gray","family":"'Space Grotesk', sans-serif"},"standoff":20},"tickfont":{"size":12,"family":"'Space Grotesk', sans-serif"},"categoryorder":"array","tickvals":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21],"ticktext":["water use","uniform changes","solar electricity","smart architecture","smaller class sizes","shortened school days","shade shelter","renewable energy","preserve trees","none","green space","government action on air\u003cbr\u003epollution","government action","global action","fans","education","depaving","cooling centers","community action","cheaper electricity","access to water","ac"],"automargin":true,"zeroline":false},"legend":{"title":{"text":"Vulnerable Group","font":{"size":12,"family":"'Space Grotesk', sans-serif"}},"tracegroupgap":0,"font":{"family":"'Space Grotesk', sans-serif"},"traceorder":"normal"},"margin":{"t":100,"l":170,"r":20,"b":100},"boxmode":"overlay","height":800,"width":950,"title":{"font":{"size":18,"family":"'Space Grotesk', sans-serif"},"subtitle":{"font":{"color":"gray","size":16,"family":"'Space Grotesk', sans-serif"},"text":""},"text":"What changes would you like to see to help with heat?","x":0.5,"xanchor":"center"},"coloraxis":{"showscale":false},"font":{"family":"'Space Grotesk', 'Inter', sans-serif"}},                        {"responsive": true}                    )                };                            </script>
+
+    <!-- job_impact_beeswarm -->
+    <script type="text/javascript">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("e636780a-c351-414a-a2d9-5bf26fc938df")) {                    Plotly.newPlot(                        "e636780a-c351-414a-a2d9-5bf26fc938df",                        [{"alignmentgroup":"True","boxpoints":"all","customdata":[["mood changes"],["harder to work"],["harder to work"],["physical discomfort"]],"fillcolor":"rgba(255,255,255,0)","hoveron":"points","hovertemplate":"\u003cb\u003eVulnerable group:\u003c\u002fb\u003e %{x}\u003cbr\u003e\u003cb\u003eJob impact:\u003c\u002fb\u003e %{customdata[0]}\u003cbr\u003e\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Caregivers","line":{"color":"rgba(255,255,255,0)"},"marker":{"color":"#fcd225","size":12,"opacity":0.5,"line":{"width":1.0,"color":"white"}},"name":"Caregivers","offsetgroup":"Caregivers","orientation":"v","pointpos":0,"showlegend":true,"x":["Caregivers","Caregivers","Caregivers","Caregivers"],"x0":" ","xaxis":"x","y":[5.065749451653431,7.985330825540492,8.086063500778732,3.0473683269742473],"y0":" ","yaxis":"y","type":"box"},{"alignmentgroup":"True","boxpoints":"all","customdata":[["harder to work"],["increased breaks"],["increased breaks"],["harder to work"],["harder to work"],["increased breaks"]],"fillcolor":"rgba(255,255,255,0)","hoveron":"points","hovertemplate":"\u003cb\u003eVulnerable group:\u003c\u002fb\u003e %{x}\u003cbr\u003e\u003cb\u003eJob impact:\u003c\u002fb\u003e %{customdata[0]}\u003cbr\u003e\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Coaches","line":{"color":"rgba(255,255,255,0)"},"marker":{"color":"#f78410","size":12,"opacity":0.5,"line":{"width":1.0,"color":"white"}},"name":"Coaches","offsetgroup":"Coaches","orientation":"v","pointpos":0,"showlegend":true,"x":["Coaches","Coaches","Coaches","Coaches","Coaches","Coaches"],"x0":" ","xaxis":"x","y":[7.902602563493036,7.114149364392821,7.062673528477685,8.06865543326647,7.910747271842131,6.988092625094936],"y0":" ","yaxis":"y","type":"box"},{"alignmentgroup":"True","boxpoints":"all","customdata":[["harder to work"],["harder to work"],["none"],["harder to work"],["harder to work"],["lightheaded"]],"fillcolor":"rgba(255,255,255,0)","hoveron":"points","hovertemplate":"\u003cb\u003eVulnerable group:\u003c\u002fb\u003e %{x}\u003cbr\u003e\u003cb\u003eJob impact:\u003c\u002fb\u003e %{customdata[0]}\u003cbr\u003e\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Outdoor workers","line":{"color":"rgba(255,255,255,0)"},"marker":{"color":"#a62098","size":12,"opacity":0.5,"line":{"width":1.0,"color":"white"}},"name":"Outdoor workers","offsetgroup":"Outdoor workers","orientation":"v","pointpos":0,"showlegend":true,"x":["Outdoor workers","Outdoor workers","Outdoor workers","Outdoor workers","Outdoor workers","Outdoor workers"],"x0":" ","xaxis":"x","y":[7.968991525815819,8.102423597323664,4.03452762881936,8.077462787184999,7.986419407718559,5.934537293228346],"y0":" ","yaxis":"y","type":"box"},{"alignmentgroup":"True","boxpoints":"all","customdata":[["reduced productivity\u002fmood changes"],["physical discomfort"],["reduced productivity"],["harder to work"],["harder to work"],["demotivating"],["pre-existing conditions worsened"],["harder to work"],["harder to work"],["harder to work"],["harder to work"],["none"],["harder to work"],["harder to work"],["harder to work"],["harder to work"],["pre-existing conditions worsened"],["harder to work"],["harder to work"],["feeling tired"],["harder to work"],["harder to work"],["pre-existing conditions worsened"],["harder to work"],["harder to work"],["pre-existing conditions worsened"],["mood changes"],["physical discomfort"],["feeling tired"],["demotivating"],["pre-existing conditions worsened"],["harder to work"],["feeling tired"],["demotivating"],["harder to work"],["pre-existing conditions worsened"],["harder to work"],["harder to work"],["none"],["harder to work"],["pre-existing conditions worsened"],["harder to work"],["harder to work"],["harder to work"],["none"],["harder to work"],["increased breaks"],["harder to work"],["harder to work"],["harder to work"],["harder to work"],["harder to work"],["mood changes"],["harder to work"],["harder to work"],["harder to work"],["harder to work"],["harder to work"],["harder to work"],["demotivating"],["reduced productivity"],["harder to work"],["reduced productivity"]],"fillcolor":"rgba(255,255,255,0)","hoveron":"points","hovertemplate":"\u003cb\u003eVulnerable group:\u003c\u002fb\u003e %{x}\u003cbr\u003e\u003cb\u003eJob impact:\u003c\u002fb\u003e %{customdata[0]}\u003cbr\u003e\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Teachers","line":{"color":"rgba(255,255,255,0)"},"marker":{"color":"#3e049c","size":12,"opacity":0.5,"line":{"width":1.0,"color":"white"}},"name":"Teachers","offsetgroup":"Teachers","orientation":"v","pointpos":0,"showlegend":true,"x":["Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers","Teachers"],"x0":" ","xaxis":"x","y":[0.01310034888380035,2.895316141465002,1.0786314812782196,8.031599455789296,8.061941057620489,9.965086232351169,2.112967525854777,8.094349069117328,8.066812039297703,7.926713289884472,7.992013040894488,3.890512903788935,7.917029478096212,8.043931748778189,8.058742917417876,8.112202335784211,1.9581980859531565,7.968910329448368,7.992693394706194,8.92547312618023,7.911181161280513,7.9941691822942245,1.9344582437722122,8.040755358723802,7.98491646052936,2.079842767053881,5.04806362448054,2.9549679939316897,9.079742352334849,10.073143445799232,1.972994810967242,7.949198744943258,9.043798920953995,9.913540596066234,7.927977968594026,1.8817669447402414,8.068861850600513,8.039564205582087,4.04923969087032,8.067374967445271,1.9901397861292016,8.016497887028695,7.913551279550638,7.907487217648634,4.040416710829713,7.993063089474352,7.015656665555485,8.063599725779847,8.032332396800141,8.01285905615792,8.014209718578899,7.9529480235350265,4.887396280296305,7.984812173415767,7.931500321476687,7.978046874493913,8.08481673758436,7.936145476607682,7.893992658005375,9.947532134085279,0.950462501864004,8.038859963534454,1.0136877165619067],"y0":" ","yaxis":"y","type":"box"}],                        {"template":{"layout":{"colorway":["#fcd225","#f78410","#a62098","#3e049c"],"font":{"family":"'Space Grotesk', 'Inter', sans-serif","size":12}}},"xaxis":{"anchor":"y","domain":[0.0,1.0],"title":{"text":"Group","font":{"size":16,"color":"gray"},"standoff":20},"categoryorder":"array","categoryarray":["Caregivers","Coaches","Outdoor workers","Teachers"],"tickfont":{"size":12},"tickangle":45,"automargin":true,"zeroline":true},"yaxis":{"anchor":"x","domain":[0.0,1.0],"title":{"text":"Impact","font":{"size":16,"color":"gray"},"standoff":20},"tickfont":{"size":12},"tickvals":[0,1,2,3,4,5,6,7,8,9,10],"ticktext":["reduced productivity\u002fmood\u003cbr\u003echanges","reduced productivity","pre-existing conditions\u003cbr\u003eworsened","physical discomfort","none","mood changes","lightheaded","increased breaks","harder to work","feeling tired","demotivating"],"showgrid":true,"gridwidth":1,"gridcolor":"rgba(0,0,0,0.1)","zeroline":false,"automargin":true},"legend":{"title":{"text":"Vulnerable group","font":{"size":12,"family":"'Space Grotesk', sans-serif"}},"tracegroupgap":0,"font":{"family":"'Space Grotesk', sans-serif"},"traceorder":"normal"},"margin":{"t":100,"l":170,"r":20,"b":100},"boxmode":"overlay","height":800,"width":950,"title":{"font":{"size":18,"family":"'Space Grotesk', sans-serif"},"subtitle":{"font":{"color":"gray","size":16,"family":"'Space Grotesk', sans-serif"},"text":""},"text":"Is heat impacting your job or making it more difficult\u002feasier?","x":0.5,"xanchor":"center"},"coloraxis":{"showscale":false},"font":{"family":"'Space Grotesk', 'Inter', sans-serif"}},                        {"responsive": true}                    )                };                            </script>
+    <!--sunburst_solutions-->
+
+    <script type="text/javascript">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("d00ab2ba-6fef-4805-87ae-74a5136f0b0f")) {                    Plotly.newPlot(                        "d00ab2ba-6fef-4805-87ae-74a5136f0b0f",                        [{"branchvalues":"total","customdata":[[22.5,41.7],[1.7,5.0],[0.8,2.5],[1.7,2.5],[0.8,5.0],[3.3,4.2],[3.3,3.3],[19.2,41.7],[0.8,6.7],[3.3,6.7],[2.5,6.7],[15.8,24.2],[4.2,4.2],[4.2,24.2],[0.8,5.0],[4.2,24.2],[0.8,3.3],[0.8,3.3],[4.2,5.0],[2.5,5.0],[1.7,3.3],[0.8,4.2],["(?)",4.2],["(?)",5.0],["(?)",5.0],["(?)",2.5],[3.3,3.3],["(?)",6.7],[4.2,4.2],["(?)",3.3],["(?)",24.2],["(?)",41.7]],"domain":{"x":[0.0,1.0],"y":[0.0,1.0]},"hovertemplate":"\u003cb\u003e%{label}\u003c\u002fb\u003e\u003cbr\u003eResponses: %{value}\u003cbr\u003ePercentage: %{percentRoot:.1%}\u003cbr\u003e\u003cextra\u003e\u003c\u002fextra\u003e","ids":["Sufficient A\u002fC & fans\u002fA\u002fC","Affordable & renewable energy\u002fCheaper electricity","Community-wide cooling\u002fCommunity action","Community-wide cooling\u002fCooling centers","Built environment changes\u002fDepaving","Access to water\u002fDrinking water","Education & awareness\u002fEducation","Sufficient A\u002fC & fans\u002fFans","Government regulation\u002fGlobal action","Government regulation\u002fGovernment action","Government regulation\u002fGovernment action on air pollution","Shade & outdoor shelter\u002fGreen space","None\u002fNone","Shade & outdoor shelter\u002fPreserve trees","Affordable & renewable energy\u002fRenewable energy","Shade & outdoor shelter\u002fShade shelter","School & work accommodations\u002fShortened school days","School & work accommodations\u002fSmaller class sizes","Built environment changes\u002fSmart architecture","Affordable & renewable energy\u002fSolar electricity","School & work accommodations\u002fUniform changes","Access to water\u002fWater use","Access to water","Affordable & renewable energy","Built environment changes","Community-wide cooling","Education & awareness","Government regulation","None","School & work accommodations","Shade & outdoor shelter","Sufficient A\u002fC & fans"],"labels":["A\u002fC","Cheaper electricity","Community action","Cooling centers","Depaving","Drinking water","Education","Fans","Global action","Government action","Government action on air pollution","Green space","None","Preserve trees","Renewable energy","Shade shelter","Shortened school days","Smaller class sizes","Smart architecture","Solar electricity","Uniform changes","Water use","Access to water","Affordable & renewable energy","Built environment changes","Community-wide cooling","Education & awareness","Government regulation","None","School & work accommodations","Shade & outdoor shelter","Sufficient A\u002fC & fans"],"name":"","parents":["Sufficient A\u002fC & fans","Affordable & renewable energy","Community-wide cooling","Community-wide cooling","Built environment changes","Access to water","Education & awareness","Sufficient A\u002fC & fans","Government regulation","Government regulation","Government regulation","Shade & outdoor shelter","None","Shade & outdoor shelter","Affordable & renewable energy","Shade & outdoor shelter","School & work accommodations","School & work accommodations","Built environment changes","Affordable & renewable energy","School & work accommodations","Access to water","","","","","","","","","",""],"values":[27,2,1,2,1,4,4,23,1,4,3,19,5,5,1,5,1,1,5,3,2,1,5,6,6,3,4,8,5,4,29,50],"type":"sunburst","textfont":{"size":12},"marker":{"line":{"color":"white","width":2}},"insidetextorientation":"radial","rotation":-30,"textinfo":"label"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmapgl":[{"type":"heatmapgl","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"legend":{"tracegroupgap":0},"margin":{"t":80,"l":10,"r":10,"b":10},"sunburstcolorway":["#0d0887","#46039f","#7201a8","#9c179e","#bd3786","#d8576b","#ed7953","#fb9f3a","#fdca26","#f0f921"],"height":800,"width":800,"title":{"font":{"size":18},"text":"What changes would you like to see to help with heat?\u003cbr\u003e\u003csub style = \"color: gray; font-size: 16px;\u003eClick and hover to explore solutions by category and percentage\u003c\u002fsub\u003e\u003cbr\u003e\u003cbr\u003e","x":0.5}},                        {"responsive": true}                    )                };                            </script> 
+<!--treemap_solutions-->
+    <script type="text/javascript">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("c7b67d6c-b0e5-49e2-82c7-650d2c0edd80")) {                    Plotly.newPlot(                        "c7b67d6c-b0e5-49e2-82c7-650d2c0edd80",                        [{"branchvalues":"total","customdata":[["Sufficient A\u002fC & fans","ac",27,22.5],["Affordable & renewable energy","cheaper electricity",2,1.7],["Community-wide cooling","community action",1,0.8],["Community-wide cooling","cooling centers",2,1.7],["Built environment changes","depaving",1,0.8],["Access to water","access to water",4,3.3],["Education & awareness","education",4,3.3],["Sufficient A\u002fC & fans","fans",23,19.2],["Government regulation","global action",1,0.8],["Government regulation","government action on air pollution",3,2.5],["Government regulation","government action",4,3.3],["Shade & outdoor shelter","green space",19,15.8],["None","none",5,4.2],["Shade & outdoor shelter","preserve trees",5,4.2],["Affordable & renewable energy","renewable energy",1,0.8],["Shade & outdoor shelter","shade shelter",5,4.2],["School & work accommodations","shortened school days",1,0.8],["School & work accommodations","smaller class sizes",1,0.8],["Built environment changes","smart architecture",5,4.2],["Affordable & renewable energy","solar electricity",3,2.5],["School & work accommodations","uniform changes",2,1.7],["Access to water","water use",1,0.8],["Access to water","(?)",5,"(?)"],["Affordable & renewable energy","(?)",6,"(?)"],["Built environment changes","(?)",6,"(?)"],["Community-wide cooling","(?)",3,"(?)"],["Education & awareness","education",4,3.3],["Government regulation","(?)",8,"(?)"],["None","none",5,4.2],["School & work accommodations","(?)",4,"(?)"],["Shade & outdoor shelter","(?)",29,"(?)"],["Sufficient A\u002fC & fans","(?)",50,"(?)"]],"domain":{"x":[0.0,1.0],"y":[0.0,1.0]},"hovertemplate":"\u003cb\u003e%{label}\u003c\u002fb\u003e\u003cbr\u003eResponses: %{value}\u003cbr\u003ePercentage: %{percentRoot:.1%}\u003cbr\u003e\u003cextra\u003e\u003c\u002fextra\u003e","ids":["Sufficient A\u002fC\u003cbr\u003e& fans\u002fA\u002fC","Affordable &\u003cbr\u003erenewable energy\u002fCheaper\u003cbr\u003eelectricity","Community-wide\u003cbr\u003ecooling\u002fCommunity\u003cbr\u003eaction","Community-wide\u003cbr\u003ecooling\u002fCooling\u003cbr\u003ecenters","Built\u003cbr\u003eenvironment changes\u002fDepaving","Access\u003cbr\u003eto water\u002fDrinking water","Education\u003cbr\u003e& awareness\u002fEducation","Sufficient A\u002fC\u003cbr\u003e& fans\u002fFans","Government\u003cbr\u003eregulation\u002fGlobal\u003cbr\u003eaction","Government\u003cbr\u003eregulation\u002fGovernment action\u003cbr\u003eon air pollution","Government\u003cbr\u003eregulation\u002fGovernment\u003cbr\u003eaction","Shade &\u003cbr\u003eoutdoor shelter\u002fGreen\u003cbr\u003espace","None\u002fNone","Shade &\u003cbr\u003eoutdoor shelter\u002fPreserve\u003cbr\u003etrees","Affordable &\u003cbr\u003erenewable energy\u002fRenewable\u003cbr\u003eenergy","Shade &\u003cbr\u003eoutdoor shelter\u002fShade\u003cbr\u003eshelter","School &\u003cbr\u003ework accommodations\u002fShortened\u003cbr\u003eschool days","School &\u003cbr\u003ework accommodations\u002fSmaller\u003cbr\u003eclass sizes","Built\u003cbr\u003eenvironment changes\u002fSmart\u003cbr\u003earchitecture","Affordable &\u003cbr\u003erenewable energy\u002fSolar\u003cbr\u003eelectricity","School &\u003cbr\u003ework accommodations\u002fUniform\u003cbr\u003echanges","Access\u003cbr\u003eto water\u002fWater\u003cbr\u003euse","Access\u003cbr\u003eto water","Affordable &\u003cbr\u003erenewable energy","Built\u003cbr\u003eenvironment changes","Community-wide\u003cbr\u003ecooling","Education\u003cbr\u003e& awareness","Government\u003cbr\u003eregulation","None","School &\u003cbr\u003ework accommodations","Shade &\u003cbr\u003eoutdoor shelter","Sufficient A\u002fC\u003cbr\u003e& fans"],"labels":["A\u002fC","Cheaper\u003cbr\u003eelectricity","Community\u003cbr\u003eaction","Cooling\u003cbr\u003ecenters","Depaving","Drinking water","Education","Fans","Global\u003cbr\u003eaction","Government action\u003cbr\u003eon air pollution","Government\u003cbr\u003eaction","Green\u003cbr\u003espace","None","Preserve\u003cbr\u003etrees","Renewable\u003cbr\u003eenergy","Shade\u003cbr\u003eshelter","Shortened\u003cbr\u003eschool days","Smaller\u003cbr\u003eclass sizes","Smart\u003cbr\u003earchitecture","Solar\u003cbr\u003eelectricity","Uniform\u003cbr\u003echanges","Water\u003cbr\u003euse","Access\u003cbr\u003eto water","Affordable &\u003cbr\u003erenewable energy","Built\u003cbr\u003eenvironment changes","Community-wide\u003cbr\u003ecooling","Education\u003cbr\u003e& awareness","Government\u003cbr\u003eregulation","None","School &\u003cbr\u003ework accommodations","Shade &\u003cbr\u003eoutdoor shelter","Sufficient A\u002fC\u003cbr\u003e& fans"],"name":"","parents":["Sufficient A\u002fC\u003cbr\u003e& fans","Affordable &\u003cbr\u003erenewable energy","Community-wide\u003cbr\u003ecooling","Community-wide\u003cbr\u003ecooling","Built\u003cbr\u003eenvironment changes","Access\u003cbr\u003eto water","Education\u003cbr\u003e& awareness","Sufficient A\u002fC\u003cbr\u003e& fans","Government\u003cbr\u003eregulation","Government\u003cbr\u003eregulation","Government\u003cbr\u003eregulation","Shade &\u003cbr\u003eoutdoor shelter","None","Shade &\u003cbr\u003eoutdoor shelter","Affordable &\u003cbr\u003erenewable energy","Shade &\u003cbr\u003eoutdoor shelter","School &\u003cbr\u003ework accommodations","School &\u003cbr\u003ework accommodations","Built\u003cbr\u003eenvironment changes","Affordable &\u003cbr\u003erenewable energy","School &\u003cbr\u003ework accommodations","Access\u003cbr\u003eto water","","","","","","","","","",""],"values":[27,2,1,2,1,4,4,23,1,3,4,19,5,5,1,5,1,1,5,3,2,1,5,6,6,3,4,8,5,4,29,50],"type":"treemap","textfont":{"size":12},"marker":{"line":{"color":"white","width":2}},"textinfo":"label","textposition":"middle center"}],                        {"template":{"layout":{"colorway":["#fcd225","#f78410","#a62098","#3e049c"],"font":{"family":"'Space Grotesk', 'Inter', sans-serif","size":12}}},"legend":{"tracegroupgap":0},"title":{"text":"What changes would you like to see to help with heat?\u003cbr\u003e\u003csub\u003eClick and hover to explore solutions by category and percentage\u003c\u002fsub\u003e"},"treemapcolorway":["#0d0887","#46039f","#7201a8","#9c179e","#bd3786","#d8576b","#ed7953","#fb9f3a","#fdca26","#f0f921"],"height":700,"width":1000,"margin":{"t":80,"l":20,"r":20,"b":20}},                        {"responsive": true}                    )                };                            </script>
+
+    <!--student_impacts-->
+    <script type="text/javascript">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("58275d85-36eb-4197-a762-bb71f45d1331")) {                    Plotly.newPlot(                        "58275d85-36eb-4197-a762-bb71f45d1331",                        [{"hoverinfo":"skip","line":{"color":"#999999","width":1.5},"mode":"lines","showlegend":false,"x":[40.86021505376344,42.857142857142854],"y":["Reduced attention","Reduced attention"],"type":"scatter"},{"hoverinfo":"skip","line":{"color":"#999999","width":1.5},"mode":"lines","showlegend":false,"x":[5.376344086021505,0.0],"y":["Physical discomfort","Physical discomfort"],"type":"scatter"},{"hoverinfo":"skip","line":{"color":"#999999","width":1.5},"mode":"lines","showlegend":false,"x":[2.1505376344086025,0.0],"y":["None","None"],"type":"scatter"},{"hoverinfo":"skip","line":{"color":"#999999","width":1.5},"mode":"lines","showlegend":false,"x":[16.129032258064516,0.0],"y":["Mood changes","Mood changes"],"type":"scatter"},{"hoverinfo":"skip","line":{"color":"#999999","width":1.5},"mode":"lines","showlegend":false,"x":[15.053763440860216,42.857142857142854],"y":["Lower performance","Lower performance"],"type":"scatter"},{"hoverinfo":"skip","line":{"color":"#999999","width":1.5},"mode":"lines","showlegend":false,"x":[20.43010752688172,14.285714285714285],"y":["Hyperactive","Hyperactive"],"type":"scatter"},{"customdata":[[38.0,40.86021505376344],[5.0,5.376344086021505],[2.0,2.1505376344086025],[15.0,16.129032258064516],[14.0,15.053763440860216],[19.0,20.43010752688172]],"hovertemplate":"\u003cb\u003eTeachers\u003c\u002fb\u003e\u003cbr\u003eResponse: %{y}\u003cbr\u003eCount: %{customdata[0]}\u003cbr\u003ePercentage: %{customdata[1]:.0f}%\u003cbr\u003e\u003cextra\u003e\u003c\u002fextra\u003e","marker":{"color":"#3e049c","line":{"color":"white","width":2},"size":12},"mode":"markers","name":"Teachers","x":[40.86021505376344,5.376344086021505,2.1505376344086025,16.129032258064516,15.053763440860216,20.43010752688172],"y":["Reduced attention","Physical discomfort","None","Mood changes","Lower performance","Hyperactive"],"type":"scatter"},{"customdata":[[3.0,42.857142857142854],[0.0,0.0],[0.0,0.0],[0.0,0.0],[3.0,42.857142857142854],[1.0,14.285714285714285]],"hovertemplate":"\u003cb\u003eCoaches\u003c\u002fb\u003e\u003cbr\u003eResponse: %{y}\u003cbr\u003eCount: %{customdata[0]}\u003cbr\u003ePercentage: %{customdata[1]:.0f}%\u003cbr\u003e\u003cextra\u003e\u003c\u002fextra\u003e","marker":{"color":"#f78410","line":{"color":"white","width":2},"size":12},"mode":"markers","name":"Coaches","x":[42.857142857142854,0.0,0.0,0.0,42.857142857142854,14.285714285714285],"y":["Reduced attention","Physical discomfort","None","Mood changes","Lower performance","Hyperactive"],"type":"scatter"}],                        {"template":{"layout":{"colorway":["#fcd225","#f78410","#a62098","#3e049c"],"font":{"family":"'Space Grotesk', 'Inter', sans-serif","size":12}}},"annotations":[{"font":{"color":"#3e049c","size":10},"showarrow":false,"text":"41%","x":40.86021505376344,"xshift":11,"y":"Reduced attention","yshift":13},{"font":{"color":"#f78410","size":10},"showarrow":false,"text":"43%","x":42.857142857142854,"xshift":11,"y":"Reduced attention","yshift":-13},{"font":{"color":"#3e049c","size":10},"showarrow":false,"text":"5%","x":5.376344086021505,"xshift":11,"y":"Physical discomfort","yshift":13},{"font":{"color":"#f78410","size":10},"showarrow":false,"text":"0%","x":0.0,"xshift":11,"y":"Physical discomfort","yshift":-13},{"font":{"color":"#3e049c","size":10},"showarrow":false,"text":"2%","x":2.1505376344086025,"xshift":11,"y":"None","yshift":13},{"font":{"color":"#f78410","size":10},"showarrow":false,"text":"0%","x":0.0,"xshift":11,"y":"None","yshift":-13},{"font":{"color":"#3e049c","size":10},"showarrow":false,"text":"16%","x":16.129032258064516,"xshift":11,"y":"Mood changes","yshift":13},{"font":{"color":"#f78410","size":10},"showarrow":false,"text":"0%","x":0.0,"xshift":11,"y":"Mood changes","yshift":-13},{"font":{"color":"#3e049c","size":10},"showarrow":false,"text":"15%","x":15.053763440860216,"xshift":11,"y":"Lower performance","yshift":13},{"font":{"color":"#f78410","size":10},"showarrow":false,"text":"43%","x":42.857142857142854,"xshift":11,"y":"Lower performance","yshift":-13},{"font":{"color":"#3e049c","size":10},"showarrow":false,"text":"20%","x":20.43010752688172,"xshift":11,"y":"Hyperactive","yshift":13},{"font":{"color":"#f78410","size":10},"showarrow":false,"text":"14%","x":14.285714285714285,"xshift":11,"y":"Hyperactive","yshift":-13}],"title":{"font":{"size":18},"text":"Is heat impacting students' attention or performance?","x":0.5,"xanchor":"center","xref":"paper"},"xaxis":{"title":{"font":{"size":14},"text":"Percentage of total responses \u003cbr\u003eTeachers: 93 responses, Coaches: 7 responses","standoff":30},"range":[-1,100],"ticksuffix":"%","showgrid":true,"gridcolor":"#e5e5e5","zeroline":true,"zerolinecolor":"#333333","ticklabelstandoff":5},"yaxis":{"tickfont":{"size":12},"title":{"text":""},"showgrid":false,"side":"left","ticklabelstandoff":3},"legend":{"font":{"size":12},"x":0.98,"y":0.98,"xanchor":"right","yanchor":"top","orientation":"v","bgcolor":"rgba(255, 255, 255, 0.8)","bordercolor":"#999999","borderwidth":1},"margin":{"l":150,"r":50,"t":100,"b":100},"plot_bgcolor":"white","hovermode":"closest","height":500,"width":1000},                        {"responsive": true}                    )                };                            </script>
+    <!--patient_impacts-->
+    <script type="text/javascript">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("6ec1fd66-d9c6-471c-90d8-7c07263b88ff")) {                    Plotly.newPlot(                        "6ec1fd66-d9c6-471c-90d8-7c07263b88ff",                        [{"hoverinfo":"skip","line":{"color":"#999999","width":1.5},"mode":"lines","showlegend":false,"x":[0,50.0],"y":["Physical discomfort","Physical discomfort"],"type":"scatter"},{"hoverinfo":"skip","line":{"color":"#999999","width":1.5},"mode":"lines","showlegend":false,"x":[0,50.0],"y":["Mood changes","Mood changes"],"type":"scatter"},{"customdata":[[1.0,50.0],[1.0,50.0]],"hovertemplate":"\u003cb\u003eCaregivers\u003c\u002fb\u003e\u003cbr\u003eResponse: %{y}\u003cbr\u003eCount: %{customdata[0]}\u003cbr\u003ePercentage: %{customdata[1]:.0f}%\u003cbr\u003e\u003cextra\u003e\u003c\u002fextra\u003e","marker":{"color":"#fcd225","line":{"color":"white","width":2},"size":12},"mode":"markers","name":"Caregivers","x":[50.0,50.0],"y":["Physical discomfort","Mood changes"],"type":"scatter"}],                        {"template":{"layout":{"colorway":["#fcd225","#f78410","#a62098","#3e049c"],"font":{"family":"'Space Grotesk', 'Inter', sans-serif","size":12}}},"annotations":[{"font":{"color":"#fcd225","size":10},"showarrow":false,"text":"50%","x":50.0,"xshift":11,"y":"Physical discomfort","yshift":13},{"font":{"color":"#fcd225","size":10},"showarrow":false,"text":"50%","x":50.0,"xshift":11,"y":"Mood changes","yshift":13}],"title":{"font":{"size":18},"text":"Do you notice your patients having a tougher time during the summer months? If yes, how?","x":0.5,"xanchor":"center","xref":"paper"},"xaxis":{"title":{"font":{"size":14},"text":"Percentage of total responses\u003cbr\u003eCaregivers: 2 responses","standoff":30},"range":[-1,100],"ticksuffix":"%","showgrid":true,"gridcolor":"#e5e5e5","zeroline":true,"zerolinecolor":"#333333","ticklabelstandoff":5},"yaxis":{"tickfont":{"size":12},"title":{"text":""},"showgrid":false,"side":"left","tickmode":"linear","automargin":true,"ticklabelstandoff":10},"legend":{"font":{"size":12},"x":0.98,"y":0.98,"xanchor":"right","yanchor":"top","orientation":"v","bgcolor":"rgba(255, 255, 255, 0.8)","bordercolor":"#999999","borderwidth":1},"margin":{"l":150,"r":50,"t":100,"b":100},"plot_bgcolor":"white","hovermode":"closest","height":500,"width":1000},                        {"responsive": true}                    )                };                            </script>
+
+    <!--vulnerability-->
+    <script type="text/javascript">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("7e02e0a4-6b7a-4fb5-88bb-20e7a1c269d4")) {                    Plotly.newPlot(                        "7e02e0a4-6b7a-4fb5-88bb-20e7a1c269d4",                        [{"customdata":[""],"hovertemplate":"\u003cb\u003eAll\u003c\u002fb\u003e\u003cbr\u003eCount: 6\u003cbr\u003ePercentage: 11.5%\u003cbr\u003e%{customdata}\u003cextra\u003e\u003c\u002fextra\u003e","insidetextanchor":"middle","legendgroup":"all","marker":{"color":"#26D5FC","line":{"color":"white","width":2}},"name":"All","orientation":"h","showlegend":true,"text":"12%","textfont":{"color":"#000000","size":12},"textposition":"inside","x":[11.538461538461538],"y":["Are there particular students that you think are more affected by heat? Why?"],"type":"bar","xaxis":"x","yaxis":"y"},{"customdata":[""],"hovertemplate":"\u003cb\u003eBoys\u003c\u002fb\u003e\u003cbr\u003eCount: 2\u003cbr\u003ePercentage: 3.8%\u003cbr\u003e%{customdata}\u003cextra\u003e\u003c\u002fextra\u003e","insidetextanchor":"middle","legendgroup":"boys","marker":{"color":"#2ab07f","line":{"color":"white","width":2}},"name":"Boys","orientation":"h","showlegend":true,"text":"4%","textfont":{"color":"#000000","size":12},"textposition":"inside","x":[3.8461538461538463],"y":["Are there particular students that you think are more affected by heat? Why?"],"type":"bar","xaxis":"x","yaxis":"y"},{"customdata":[""],"hovertemplate":"\u003cb\u003eDisability\u003c\u002fb\u003e\u003cbr\u003eCount: 7\u003cbr\u003ePercentage: 13.5%\u003cbr\u003e%{customdata}\u003cextra\u003e\u003c\u002fextra\u003e","insidetextanchor":"middle","legendgroup":"disability","marker":{"color":"#fcd225","line":{"color":"white","width":2}},"name":"Disability","orientation":"h","showlegend":true,"text":"13%","textfont":{"color":"#000000","size":12},"textposition":"inside","x":[13.461538461538462],"y":["Are there particular students that you think are more affected by heat? Why?"],"type":"bar","xaxis":"x","yaxis":"y"},{"customdata":[""],"hovertemplate":"\u003cb\u003eHigh-income students\u003c\u002fb\u003e\u003cbr\u003eCount: 5\u003cbr\u003ePercentage: 9.6%\u003cbr\u003e%{customdata}\u003cextra\u003e\u003c\u002fextra\u003e","insidetextanchor":"middle","legendgroup":"high-income students","marker":{"color":"#f78410","line":{"color":"white","width":2}},"name":"High-income students","orientation":"h","showlegend":true,"text":"10%","textfont":{"color":"#000000","size":12},"textposition":"inside","x":[9.615384615384617],"y":["Are there particular students that you think are more affected by heat? Why?"],"type":"bar","xaxis":"x","yaxis":"y"},{"customdata":[""],"hovertemplate":"\u003cb\u003eNone\u003c\u002fb\u003e\u003cbr\u003eCount: 4\u003cbr\u003ePercentage: 7.7%\u003cbr\u003e%{customdata}\u003cextra\u003e\u003c\u002fextra\u003e","insidetextanchor":"middle","legendgroup":"none","marker":{"color":"#b83289","line":{"color":"white","width":2}},"name":"None","orientation":"h","showlegend":true,"text":"8%","textfont":{"color":"#FFFFFF","size":12},"textposition":"inside","x":[7.6923076923076925],"y":["Are there particular students that you think are more affected by heat? Why?"],"type":"bar","xaxis":"x","yaxis":"y"},{"customdata":[""],"hovertemplate":"\u003cb\u003eOverweight\u003c\u002fb\u003e\u003cbr\u003eCount: 3\u003cbr\u003ePercentage: 5.8%\u003cbr\u003e%{customdata}\u003cextra\u003e\u003c\u002fextra\u003e","insidetextanchor":"middle","legendgroup":"overweight","marker":{"color":"#d44842","line":{"color":"white","width":2}},"name":"Overweight","orientation":"h","showlegend":true,"text":"6%","textfont":{"color":"#FFFFFF","size":12},"textposition":"inside","x":[5.769230769230769],"y":["Are there particular students that you think are more affected by heat? Why?"],"type":"bar","xaxis":"x","yaxis":"y"},{"customdata":[""],"hovertemplate":"\u003cb\u003ePre-existing health conditions\u003c\u002fb\u003e\u003cbr\u003eCount: 17\u003cbr\u003ePercentage: 32.7%\u003cbr\u003e%{customdata}\u003cextra\u003e\u003c\u002fextra\u003e","insidetextanchor":"middle","legendgroup":"pre-existing health conditions","marker":{"color":"#8b0aa5","line":{"color":"white","width":2}},"name":"Pre-existing health conditions","orientation":"h","showlegend":true,"text":"33%","textfont":{"color":"#FFFFFF","size":12},"textposition":"inside","x":[32.69230769230769],"y":["Are there particular students that you think are more affected by heat? Why?"],"type":"bar","xaxis":"x","yaxis":"y"},{"customdata":[""],"hovertemplate":"\u003cb\u003eYes, reason unclear\u003c\u002fb\u003e\u003cbr\u003eCount: 7\u003cbr\u003ePercentage: 13.5%\u003cbr\u003e%{customdata}\u003cextra\u003e\u003c\u002fextra\u003e","insidetextanchor":"middle","legendgroup":"yes, reason unclear","marker":{"color":"#6E657D","line":{"color":"white","width":2}},"name":"Yes, reason unclear","orientation":"h","showlegend":true,"text":"13%","textfont":{"color":"#FFFFFF","size":12},"textposition":"inside","x":[13.461538461538462],"y":["Are there particular students that you think are more affected by heat? Why?"],"type":"bar","xaxis":"x","yaxis":"y"},{"customdata":["\u003ci\u003eathletes\u003c\u002fi\u003e"],"hovertemplate":"\u003cb\u003eOther\u003c\u002fb\u003e\u003cbr\u003eCount: 1\u003cbr\u003ePercentage: 1.9%\u003cbr\u003e%{customdata}\u003cextra\u003e\u003c\u002fextra\u003e","insidetextanchor":"middle","legendgroup":"Other","marker":{"color":"#2640E5","line":{"color":"white","width":2}},"name":"Other","orientation":"h","showlegend":true,"text":"","textfont":{"color":"#FFFFFF","size":12},"textposition":"inside","x":[1.9230769230769231],"y":["Are there particular students that you think are more affected by heat? Why?"],"type":"bar","xaxis":"x","yaxis":"y"},{"customdata":[""],"hovertemplate":"\u003cb\u003eAthletes\u003c\u002fb\u003e\u003cbr\u003eCount: 1\u003cbr\u003ePercentage: 33.3%\u003cbr\u003e%{customdata}\u003cextra\u003e\u003c\u002fextra\u003e","insidetextanchor":"middle","legendgroup":"athletes","marker":{"color":"#2d708e","line":{"color":"white","width":2}},"name":"Athletes","orientation":"h","showlegend":true,"text":"33%","textfont":{"color":"#FFFFFF","size":12},"textposition":"inside","x":[33.33333333333333],"y":["Are there particular student athletes that you think are more affected by heat? Why?"],"type":"bar","xaxis":"x2","yaxis":"y2"},{"customdata":[""],"hovertemplate":"\u003cb\u003ePre-existing health conditions\u003c\u002fb\u003e\u003cbr\u003eCount: 2\u003cbr\u003ePercentage: 66.7%\u003cbr\u003e%{customdata}\u003cextra\u003e\u003c\u002fextra\u003e","insidetextanchor":"middle","legendgroup":"pre-existing health conditions","marker":{"color":"#8b0aa5","line":{"color":"white","width":2}},"name":"Pre-existing health conditions","orientation":"h","showlegend":false,"text":"67%","textfont":{"color":"#FFFFFF","size":12},"textposition":"inside","x":[66.66666666666666],"y":["Are there particular student athletes that you think are more affected by heat? Why?"],"type":"bar","xaxis":"x2","yaxis":"y2"},{"customdata":[""],"hovertemplate":"\u003cb\u003ePre-existing health conditions\u003c\u002fb\u003e\u003cbr\u003eCount: 1\u003cbr\u003ePercentage: 33.3%\u003cbr\u003e%{customdata}\u003cextra\u003e\u003c\u002fextra\u003e","insidetextanchor":"middle","legendgroup":"pre-existing health conditions","marker":{"color":"#8b0aa5","line":{"color":"white","width":2}},"name":"Pre-existing health conditions","orientation":"h","showlegend":false,"text":"33%","textfont":{"color":"#FFFFFF","size":12},"textposition":"inside","x":[33.33333333333333],"y":["Are there particular patients that you think are more affected by heat? Why?"],"type":"bar","xaxis":"x3","yaxis":"y3"},{"customdata":[""],"hovertemplate":"\u003cb\u003ePrenatal\u003c\u002fb\u003e\u003cbr\u003eCount: 1\u003cbr\u003ePercentage: 33.3%\u003cbr\u003e%{customdata}\u003cextra\u003e\u003c\u002fextra\u003e","insidetextanchor":"middle","legendgroup":"prenatal","marker":{"color":"#3e049c","line":{"color":"white","width":2}},"name":"Prenatal","orientation":"h","showlegend":true,"text":"33%","textfont":{"color":"#FFFFFF","size":12},"textposition":"inside","x":[33.33333333333333],"y":["Are there particular patients that you think are more affected by heat? Why?"],"type":"bar","xaxis":"x3","yaxis":"y3"},{"customdata":[""],"hovertemplate":"\u003cb\u003eYes, reason unclear\u003c\u002fb\u003e\u003cbr\u003eCount: 1\u003cbr\u003ePercentage: 33.3%\u003cbr\u003e%{customdata}\u003cextra\u003e\u003c\u002fextra\u003e","insidetextanchor":"middle","legendgroup":"yes, reason unclear","marker":{"color":"#6E657D","line":{"color":"white","width":2}},"name":"Yes, reason unclear","orientation":"h","showlegend":false,"text":"33%","textfont":{"color":"#FFFFFF","size":12},"textposition":"inside","x":[33.33333333333333],"y":["Are there particular patients that you think are more affected by heat? Why?"],"type":"bar","xaxis":"x3","yaxis":"y3"}],                        {"template":{"layout":{"colorway":["#fcd225","#f78410","#a62098","#3e049c"],"font":{"family":"'Space Grotesk', 'Inter', sans-serif","size":12}}},"xaxis":{"anchor":"y","domain":[0.0,1.0]},"yaxis":{"anchor":"x","domain":[0.7144,1.0],"showticklabels":false},"xaxis2":{"anchor":"y2","domain":[0.0,1.0]},"yaxis2":{"anchor":"x2","domain":[0.3572,0.6344000000000001],"showticklabels":false},"xaxis3":{"anchor":"y3","domain":[0.0,1.0]},"yaxis3":{"anchor":"x3","domain":[0.0,0.2772],"showticklabels":false},"annotations":[{"font":{"size":14},"showarrow":false,"text":"Teachers: Are there particular students that you think are more affected by heat? Why?","x":0.5,"xanchor":"center","xref":"paper","y":1.0,"yanchor":"bottom","yref":"paper"},{"font":{"size":14},"showarrow":false,"text":"Coaches: Are there particular student athletes that you think are more affected by heat? Why?","x":0.5,"xanchor":"center","xref":"paper","y":0.6344000000000001,"yanchor":"bottom","yref":"paper"},{"font":{"size":14},"showarrow":false,"text":"Caregivers: Are there particular patients that you think are more affected by heat? Why?","x":0.5,"xanchor":"center","xref":"paper","y":0.2772,"yanchor":"bottom","yref":"paper"},{"font":{"color":"#D3D3D3","size":12},"showarrow":false,"text":"n = 41","x":0.94,"xanchor":"right","xref":"paper","y":0.96,"yanchor":"top","yref":"paper"},{"font":{"color":"#D3D3D3","size":12},"showarrow":false,"text":"n = 3","x":0.94,"xanchor":"right","xref":"paper","y":0.595,"yanchor":"top","yref":"paper"},{"font":{"color":"#D3D3D3","size":12},"showarrow":false,"text":"n = 2","x":0.94,"xanchor":"right","xref":"paper","y":0.235,"yanchor":"top","yref":"paper"}],"title":{"font":{"family":"'Space Grotesk', 'Inter', sans-serif","size":22},"text":"Multiple student and patient populations are more sensitive to extreme heat","x":0.5,"y":0.98,"xanchor":"center"},"legend":{"font":{"family":"'Space Grotesk', 'Inter', sans-serif","size":12},"orientation":"h","yanchor":"top","y":0.95,"xanchor":"center","x":0.5,"xref":"container","yref":"container","bgcolor":"rgba(255,255,255,0.8)","traceorder":"normal","tracegroupgap":10,"itemwidth":30},"margin":{"t":150,"b":80,"l":40,"r":40},"font":{"family":"sans-serif"},"barmode":"stack","height":1080,"showlegend":true,"plot_bgcolor":"white","paper_bgcolor":"white","autosize":true},                        {"responsive": false, "displayModeBar": false}                    )                };                            </script>
+
+    <!--institutional coping-->
+
+    <!--individual teacher caregiver coping-->
+<script type="text/javascript">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("11ffc9b4-7534-4b80-9af2-a1a7b37adfc0")) {                    Plotly.newPlot(                        "11ffc9b4-7534-4b80-9af2-a1a7b37adfc0",                        [{"customdata":[""],"hovertemplate":"\u003cb\u003eAdjusting activities\u003c\u002fb\u003e\u003cbr\u003eCount: 6\u003cbr\u003ePercentage: 6.1%\u003cbr\u003e%{customdata}\u003cextra\u003e\u003c\u002fextra\u003e","insidetextanchor":"middle","legendgroup":"adjusting activities","marker":{"color":"#26D5FC","line":{"color":"white","width":2}},"name":"Adjusting activities","orientation":"h","showlegend":true,"text":"6%","textfont":{"color":"#000000","size":12},"textposition":"inside","x":[6.0606060606060606],"y":["What are you doing to reduce the impact of heat on your students?"],"type":"bar","xaxis":"x","yaxis":"y"},{"customdata":[""],"hovertemplate":"\u003cb\u003eChanging lesson plan\u003c\u002fb\u003e\u003cbr\u003eCount: 3\u003cbr\u003ePercentage: 3.0%\u003cbr\u003e%{customdata}\u003cextra\u003e\u003c\u002fextra\u003e","insidetextanchor":"middle","legendgroup":"changing lesson plan","marker":{"color":"#2d708e","line":{"color":"white","width":2}},"name":"Changing lesson plan","orientation":"h","showlegend":true,"text":"3%","textfont":{"color":"#FFFFFF","size":12},"textposition":"inside","x":[3.0303030303030303],"y":["What are you doing to reduce the impact of heat on your students?"],"type":"bar","xaxis":"x","yaxis":"y"},{"customdata":[""],"hovertemplate":"\u003cb\u003eClothing adjustments\u003c\u002fb\u003e\u003cbr\u003eCount: 7\u003cbr\u003ePercentage: 7.1%\u003cbr\u003e%{customdata}\u003cextra\u003e\u003c\u002fextra\u003e","insidetextanchor":"middle","legendgroup":"clothing adjustments","marker":{"color":"#2ab07f","line":{"color":"white","width":2}},"name":"Clothing adjustments","orientation":"h","showlegend":true,"text":"7%","textfont":{"color":"#000000","size":12},"textposition":"inside","x":[7.07070707070707],"y":["What are you doing to reduce the impact of heat on your students?"],"type":"bar","xaxis":"x","yaxis":"y"},{"customdata":[""],"hovertemplate":"\u003cb\u003eFinding shade\u003c\u002fb\u003e\u003cbr\u003eCount: 3\u003cbr\u003ePercentage: 3.0%\u003cbr\u003e%{customdata}\u003cextra\u003e\u003c\u002fextra\u003e","insidetextanchor":"middle","legendgroup":"finding shade","marker":{"color":"#fcd225","line":{"color":"white","width":2}},"name":"Finding shade","orientation":"h","showlegend":true,"text":"3%","textfont":{"color":"#000000","size":12},"textposition":"inside","x":[3.0303030303030303],"y":["What are you doing to reduce the impact of heat on your students?"],"type":"bar","xaxis":"x","yaxis":"y"},{"customdata":[""],"hovertemplate":"\u003cb\u003eHydration\u003c\u002fb\u003e\u003cbr\u003eCount: 30\u003cbr\u003ePercentage: 30.3%\u003cbr\u003e%{customdata}\u003cextra\u003e\u003c\u002fextra\u003e","insidetextanchor":"middle","legendgroup":"hydration","marker":{"color":"#f78410","line":{"color":"white","width":2}},"name":"Hydration","orientation":"h","showlegend":true,"text":"30%","textfont":{"color":"#000000","size":12},"textposition":"inside","x":[30.303030303030305],"y":["What are you doing to reduce the impact of heat on your students?"],"type":"bar","xaxis":"x","yaxis":"y"},{"customdata":[""],"hovertemplate":"\u003cb\u003eIncreased breaks\u003c\u002fb\u003e\u003cbr\u003eCount: 16\u003cbr\u003ePercentage: 16.2%\u003cbr\u003e%{customdata}\u003cextra\u003e\u003c\u002fextra\u003e","insidetextanchor":"middle","legendgroup":"increased breaks","marker":{"color":"#b83289","line":{"color":"white","width":2}},"name":"Increased breaks","orientation":"h","showlegend":true,"text":"16%","textfont":{"color":"#FFFFFF","size":12},"textposition":"inside","x":[16.161616161616163],"y":["What are you doing to reduce the impact of heat on your students?"],"type":"bar","xaxis":"x","yaxis":"y"},{"customdata":[""],"hovertemplate":"\u003cb\u003eSitting outdoors\u003c\u002fb\u003e\u003cbr\u003eCount: 12\u003cbr\u003ePercentage: 12.1%\u003cbr\u003e%{customdata}\u003cextra\u003e\u003c\u002fextra\u003e","insidetextanchor":"middle","legendgroup":"sitting outdoors","marker":{"color":"#8b0aa5","line":{"color":"white","width":2}},"name":"Sitting outdoors","orientation":"h","showlegend":true,"text":"12%","textfont":{"color":"#FFFFFF","size":12},"textposition":"inside","x":[12.121212121212121],"y":["What are you doing to reduce the impact of heat on your students?"],"type":"bar","xaxis":"x","yaxis":"y"},{"customdata":[""],"hovertemplate":"\u003cb\u003eStaying indoors\u003c\u002fb\u003e\u003cbr\u003eCount: 3\u003cbr\u003ePercentage: 3.0%\u003cbr\u003e%{customdata}\u003cextra\u003e\u003c\u002fextra\u003e","insidetextanchor":"middle","legendgroup":"staying indoors","marker":{"color":"#3e049c","line":{"color":"white","width":2}},"name":"Staying indoors","orientation":"h","showlegend":true,"text":"3%","textfont":{"color":"#FFFFFF","size":12},"textposition":"inside","x":[3.0303030303030303],"y":["What are you doing to reduce the impact of heat on your students?"],"type":"bar","xaxis":"x","yaxis":"y"},{"customdata":[""],"hovertemplate":"\u003cb\u003eUse of fans\u003c\u002fb\u003e\u003cbr\u003eCount: 9\u003cbr\u003ePercentage: 9.1%\u003cbr\u003e%{customdata}\u003cextra\u003e\u003c\u002fextra\u003e","insidetextanchor":"middle","legendgroup":"use of fans","marker":{"color":"#6E657D","line":{"color":"white","width":2}},"name":"Use of fans","orientation":"h","showlegend":true,"text":"9%","textfont":{"color":"#FFFFFF","size":12},"textposition":"inside","x":[9.090909090909092],"y":["What are you doing to reduce the impact of heat on your students?"],"type":"bar","xaxis":"x","yaxis":"y"},{"customdata":[""],"hovertemplate":"\u003cb\u003eWater use\u003c\u002fb\u003e\u003cbr\u003eCount: 6\u003cbr\u003ePercentage: 6.1%\u003cbr\u003e%{customdata}\u003cextra\u003e\u003c\u002fextra\u003e","insidetextanchor":"middle","legendgroup":"water use","marker":{"color":"#D9BF1A","line":{"color":"white","width":2}},"name":"Water use","orientation":"h","showlegend":true,"text":"6%","textfont":{"color":"#000000","size":12},"textposition":"inside","x":[6.0606060606060606],"y":["What are you doing to reduce the impact of heat on your students?"],"type":"bar","xaxis":"x","yaxis":"y"},{"customdata":["\u003ci\u003efan(s), green space, none, nutrition\u003c\u002fi\u003e"],"hovertemplate":"\u003cb\u003eOther\u003c\u002fb\u003e\u003cbr\u003eCount: 4\u003cbr\u003ePercentage: 4.0%\u003cbr\u003e%{customdata}\u003cextra\u003e\u003c\u002fextra\u003e","insidetextanchor":"middle","legendgroup":"Other","marker":{"color":"#2640E5","line":{"color":"white","width":2}},"name":"Other","orientation":"h","showlegend":true,"text":"4%","textfont":{"color":"#FFFFFF","size":12},"textposition":"inside","x":[4.040404040404041],"y":["What are you doing to reduce the impact of heat on your students?"],"type":"bar","xaxis":"x","yaxis":"y"},{"customdata":[""],"hovertemplate":"\u003cb\u003eChanging lesson plan\u003c\u002fb\u003e\u003cbr\u003eCount: 1\u003cbr\u003ePercentage: 14.3%\u003cbr\u003e%{customdata}\u003cextra\u003e\u003c\u002fextra\u003e","insidetextanchor":"middle","legendgroup":"changing lesson plan","marker":{"color":"#2d708e","line":{"color":"white","width":2}},"name":"Changing lesson plan","orientation":"h","showlegend":false,"text":"14%","textfont":{"color":"#FFFFFF","size":12},"textposition":"inside","x":[14.285714285714285],"y":["What are you doing to reduce the impact of heat on student athletes?"],"type":"bar","xaxis":"x2","yaxis":"y2"},{"customdata":[""],"hovertemplate":"\u003cb\u003eClothing adjustments\u003c\u002fb\u003e\u003cbr\u003eCount: 1\u003cbr\u003ePercentage: 14.3%\u003cbr\u003e%{customdata}\u003cextra\u003e\u003c\u002fextra\u003e","insidetextanchor":"middle","legendgroup":"clothing adjustments","marker":{"color":"#2ab07f","line":{"color":"white","width":2}},"name":"Clothing adjustments","orientation":"h","showlegend":false,"text":"14%","textfont":{"color":"#000000","size":12},"textposition":"inside","x":[14.285714285714285],"y":["What are you doing to reduce the impact of heat on student athletes?"],"type":"bar","xaxis":"x2","yaxis":"y2"},{"customdata":[""],"hovertemplate":"\u003cb\u003eHydration\u003c\u002fb\u003e\u003cbr\u003eCount: 3\u003cbr\u003ePercentage: 42.9%\u003cbr\u003e%{customdata}\u003cextra\u003e\u003c\u002fextra\u003e","insidetextanchor":"middle","legendgroup":"hydration","marker":{"color":"#f78410","line":{"color":"white","width":2}},"name":"Hydration","orientation":"h","showlegend":false,"text":"43%","textfont":{"color":"#000000","size":12},"textposition":"inside","x":[42.857142857142854],"y":["What are you doing to reduce the impact of heat on student athletes?"],"type":"bar","xaxis":"x2","yaxis":"y2"},{"customdata":[""],"hovertemplate":"\u003cb\u003eIncreased breaks\u003c\u002fb\u003e\u003cbr\u003eCount: 2\u003cbr\u003ePercentage: 28.6%\u003cbr\u003e%{customdata}\u003cextra\u003e\u003c\u002fextra\u003e","insidetextanchor":"middle","legendgroup":"increased breaks","marker":{"color":"#b83289","line":{"color":"white","width":2}},"name":"Increased breaks","orientation":"h","showlegend":false,"text":"29%","textfont":{"color":"#FFFFFF","size":12},"textposition":"inside","x":[28.57142857142857],"y":["What are you doing to reduce the impact of heat on student athletes?"],"type":"bar","xaxis":"x2","yaxis":"y2"},{"customdata":[""],"hovertemplate":"\u003cb\u003eAdjusting activities\u003c\u002fb\u003e\u003cbr\u003eCount: 1\u003cbr\u003ePercentage: 14.3%\u003cbr\u003e%{customdata}\u003cextra\u003e\u003c\u002fextra\u003e","insidetextanchor":"middle","legendgroup":"adjusting activities","marker":{"color":"#26D5FC","line":{"color":"white","width":2}},"name":"Adjusting activities","orientation":"h","showlegend":false,"text":"14%","textfont":{"color":"#000000","size":12},"textposition":"inside","x":[14.285714285714285],"y":["What are you doing to reduce the impact of heat for your patients?"],"type":"bar","xaxis":"x3","yaxis":"y3"},{"customdata":[""],"hovertemplate":"\u003cb\u003eHydration\u003c\u002fb\u003e\u003cbr\u003eCount: 2\u003cbr\u003ePercentage: 28.6%\u003cbr\u003e%{customdata}\u003cextra\u003e\u003c\u002fextra\u003e","insidetextanchor":"middle","legendgroup":"hydration","marker":{"color":"#f78410","line":{"color":"white","width":2}},"name":"Hydration","orientation":"h","showlegend":false,"text":"29%","textfont":{"color":"#000000","size":12},"textposition":"inside","x":[28.57142857142857],"y":["What are you doing to reduce the impact of heat for your patients?"],"type":"bar","xaxis":"x3","yaxis":"y3"},{"customdata":[""],"hovertemplate":"\u003cb\u003eOpen windows\u003c\u002fb\u003e\u003cbr\u003eCount: 1\u003cbr\u003ePercentage: 14.3%\u003cbr\u003e%{customdata}\u003cextra\u003e\u003c\u002fextra\u003e","insidetextanchor":"middle","legendgroup":"open windows","marker":{"color":"#d44842","line":{"color":"white","width":2}},"name":"Open windows","orientation":"h","showlegend":true,"text":"14%","textfont":{"color":"#FFFFFF","size":12},"textposition":"inside","x":[14.285714285714285],"y":["What are you doing to reduce the impact of heat for your patients?"],"type":"bar","xaxis":"x3","yaxis":"y3"},{"customdata":[""],"hovertemplate":"\u003cb\u003eSitting outdoors\u003c\u002fb\u003e\u003cbr\u003eCount: 1\u003cbr\u003ePercentage: 14.3%\u003cbr\u003e%{customdata}\u003cextra\u003e\u003c\u002fextra\u003e","insidetextanchor":"middle","legendgroup":"sitting outdoors","marker":{"color":"#8b0aa5","line":{"color":"white","width":2}},"name":"Sitting outdoors","orientation":"h","showlegend":false,"text":"14%","textfont":{"color":"#FFFFFF","size":12},"textposition":"inside","x":[14.285714285714285],"y":["What are you doing to reduce the impact of heat for your patients?"],"type":"bar","xaxis":"x3","yaxis":"y3"},{"customdata":[""],"hovertemplate":"\u003cb\u003eUse of fans\u003c\u002fb\u003e\u003cbr\u003eCount: 2\u003cbr\u003ePercentage: 28.6%\u003cbr\u003e%{customdata}\u003cextra\u003e\u003c\u002fextra\u003e","insidetextanchor":"middle","legendgroup":"use of fans","marker":{"color":"#6E657D","line":{"color":"white","width":2}},"name":"Use of fans","orientation":"h","showlegend":false,"text":"29%","textfont":{"color":"#FFFFFF","size":12},"textposition":"inside","x":[28.57142857142857],"y":["What are you doing to reduce the impact of heat for your patients?"],"type":"bar","xaxis":"x3","yaxis":"y3"}],                        {"template":{"layout":{"colorway":["#fcd225","#f78410","#a62098","#3e049c"],"font":{"family":"'Space Grotesk', 'Inter', sans-serif","size":12}}},"xaxis":{"anchor":"y","domain":[0.0,1.0]},"yaxis":{"anchor":"x","domain":[0.7144,1.0],"showticklabels":false},"xaxis2":{"anchor":"y2","domain":[0.0,1.0]},"yaxis2":{"anchor":"x2","domain":[0.3572,0.6344000000000001],"showticklabels":false},"xaxis3":{"anchor":"y3","domain":[0.0,1.0]},"yaxis3":{"anchor":"x3","domain":[0.0,0.2772],"showticklabels":false},"annotations":[{"font":{"size":14},"showarrow":false,"text":"Teachers: What are you doing to reduce the impact of heat on your students?","x":0.5,"xanchor":"center","xref":"paper","y":1.0,"yanchor":"bottom","yref":"paper"},{"font":{"size":14},"showarrow":false,"text":"Coaches: What are you doing to reduce the impact of heat on student athletes?","x":0.5,"xanchor":"center","xref":"paper","y":0.6344000000000001,"yanchor":"bottom","yref":"paper"},{"font":{"size":14},"showarrow":false,"text":"Caregivers: What are you doing to reduce the impact of heat for your patients?","x":0.5,"xanchor":"center","xref":"paper","y":0.2772,"yanchor":"bottom","yref":"paper"},{"font":{"color":"#D3D3D3","size":12},"showarrow":false,"text":"n = 41","x":0.94,"xanchor":"right","xref":"paper","y":0.96,"yanchor":"top","yref":"paper"},{"font":{"color":"#D3D3D3","size":12},"showarrow":false,"text":"n = 3","x":0.94,"xanchor":"right","xref":"paper","y":0.595,"yanchor":"top","yref":"paper"},{"font":{"color":"#D3D3D3","size":12},"showarrow":false,"text":"n = 2","x":0.94,"xanchor":"right","xref":"paper","y":0.235,"yanchor":"top","yref":"paper"}],"title":{"font":{"size":22},"text":"How individual educators and caregivers help their students and patients cope with extreme heat","x":0.5,"y":0.98,"xanchor":"center"},"legend":{"font":{"size":12},"orientation":"h","yanchor":"top","y":0.95,"xanchor":"center","x":0.5,"xref":"container","yref":"container","bgcolor":"rgba(255,255,255,0.8)","traceorder":"normal","tracegroupgap":10,"itemwidth":30},"margin":{"t":150,"b":80,"l":40,"r":40},"font":{"family":"sans-serif"},"barmode":"stack","height":1080,"showlegend":true,"plot_bgcolor":"white","paper_bgcolor":"white","autosize":true},                        {"responsive": false, "displayModeBar": false}                    )                };                            </script>
+<!--institutional_coping -->
+<script type="text/javascript">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("36931a69-82e0-47b3-9fd6-c165b1698e03")) {                    Plotly.newPlot(                        "36931a69-82e0-47b3-9fd6-c165b1698e03",                        [{"customdata":[""],"hovertemplate":"\u003cb\u003eAdjusting activities\u003c\u002fb\u003e\u003cbr\u003eCount: 3\u003cbr\u003ePercentage: 3.2%\u003cbr\u003e%{customdata}\u003cextra\u003e\u003c\u002fextra\u003e","insidetextanchor":"middle","legendgroup":"adjusting activities","marker":{"color":"#26D5FC","line":{"color":"white","width":2}},"name":"Adjusting activities","orientation":"h","showlegend":true,"text":"3%","textfont":{"color":"#000000","size":12},"textposition":"inside","x":[3.1578947368421053],"y":["What is the school doing to reduce the impact of heat on your students?"],"type":"bar","xaxis":"x","yaxis":"y"},{"customdata":[""],"hovertemplate":"\u003cb\u003eFinding shade\u003c\u002fb\u003e\u003cbr\u003eCount: 4\u003cbr\u003ePercentage: 4.2%\u003cbr\u003e%{customdata}\u003cextra\u003e\u003c\u002fextra\u003e","insidetextanchor":"middle","legendgroup":"finding shade","marker":{"color":"#2d708e","line":{"color":"white","width":2}},"name":"Finding shade","orientation":"h","showlegend":true,"text":"4%","textfont":{"color":"#FFFFFF","size":12},"textposition":"inside","x":[4.2105263157894735],"y":["What is the school doing to reduce the impact of heat on your students?"],"type":"bar","xaxis":"x","yaxis":"y"},{"customdata":[""],"hovertemplate":"\u003cb\u003eHydration\u003c\u002fb\u003e\u003cbr\u003eCount: 19\u003cbr\u003ePercentage: 20.0%\u003cbr\u003e%{customdata}\u003cextra\u003e\u003c\u002fextra\u003e","insidetextanchor":"middle","legendgroup":"hydration","marker":{"color":"#2ab07f","line":{"color":"white","width":2}},"name":"Hydration","orientation":"h","showlegend":true,"text":"20%","textfont":{"color":"#000000","size":12},"textposition":"inside","x":[20.0],"y":["What is the school doing to reduce the impact of heat on your students?"],"type":"bar","xaxis":"x","yaxis":"y"},{"customdata":[""],"hovertemplate":"\u003cb\u003eIncreased breaks\u003c\u002fb\u003e\u003cbr\u003eCount: 7\u003cbr\u003ePercentage: 7.4%\u003cbr\u003e%{customdata}\u003cextra\u003e\u003c\u002fextra\u003e","insidetextanchor":"middle","legendgroup":"increased breaks","marker":{"color":"#fcd225","line":{"color":"white","width":2}},"name":"Increased breaks","orientation":"h","showlegend":true,"text":"7%","textfont":{"color":"#000000","size":12},"textposition":"inside","x":[7.368421052631578],"y":["What is the school doing to reduce the impact of heat on your students?"],"type":"bar","xaxis":"x","yaxis":"y"},{"customdata":[""],"hovertemplate":"\u003cb\u003eStaying indoors\u003c\u002fb\u003e\u003cbr\u003eCount: 8\u003cbr\u003ePercentage: 8.4%\u003cbr\u003e%{customdata}\u003cextra\u003e\u003c\u002fextra\u003e","insidetextanchor":"middle","legendgroup":"staying indoors","marker":{"color":"#f78410","line":{"color":"white","width":2}},"name":"Staying indoors","orientation":"h","showlegend":true,"text":"8%","textfont":{"color":"#000000","size":12},"textposition":"inside","x":[8.421052631578947],"y":["What is the school doing to reduce the impact of heat on your students?"],"type":"bar","xaxis":"x","yaxis":"y"},{"customdata":[""],"hovertemplate":"\u003cb\u003eUse of ac\u003c\u002fb\u003e\u003cbr\u003eCount: 9\u003cbr\u003ePercentage: 9.5%\u003cbr\u003e%{customdata}\u003cextra\u003e\u003c\u002fextra\u003e","insidetextanchor":"middle","legendgroup":"use of ac","marker":{"color":"#b83289","line":{"color":"white","width":2}},"name":"Use of ac","orientation":"h","showlegend":true,"text":"9%","textfont":{"color":"#FFFFFF","size":12},"textposition":"inside","x":[9.473684210526317],"y":["What is the school doing to reduce the impact of heat on your students?"],"type":"bar","xaxis":"x","yaxis":"y"},{"customdata":[""],"hovertemplate":"\u003cb\u003eUse of fans\u003c\u002fb\u003e\u003cbr\u003eCount: 36\u003cbr\u003ePercentage: 37.9%\u003cbr\u003e%{customdata}\u003cextra\u003e\u003c\u002fextra\u003e","insidetextanchor":"middle","legendgroup":"use of fans","marker":{"color":"#d44842","line":{"color":"white","width":2}},"name":"Use of fans","orientation":"h","showlegend":true,"text":"38%","textfont":{"color":"#FFFFFF","size":12},"textposition":"inside","x":[37.89473684210527],"y":["What is the school doing to reduce the impact of heat on your students?"],"type":"bar","xaxis":"x","yaxis":"y"},{"customdata":["\u003ci\u003eaccess to water, changing lesson plan, clothing adjustments, green space, none, smart architecture\u003c\u002fi\u003e"],"hovertemplate":"\u003cb\u003eOther\u003c\u002fb\u003e\u003cbr\u003eCount: 9\u003cbr\u003ePercentage: 9.5%\u003cbr\u003e%{customdata}\u003cextra\u003e\u003c\u002fextra\u003e","insidetextanchor":"middle","legendgroup":"Other","marker":{"color":"#2640E5","line":{"color":"white","width":2}},"name":"Other","orientation":"h","showlegend":true,"text":"9%","textfont":{"color":"#FFFFFF","size":12},"textposition":"inside","x":[9.473684210526315],"y":["What is the school doing to reduce the impact of heat on your students?"],"type":"bar","xaxis":"x","yaxis":"y"},{"customdata":[""],"hovertemplate":"\u003cb\u003eAdjusting activities\u003c\u002fb\u003e\u003cbr\u003eCount: 2\u003cbr\u003ePercentage: 25.0%\u003cbr\u003e%{customdata}\u003cextra\u003e\u003c\u002fextra\u003e","insidetextanchor":"middle","legendgroup":"adjusting activities","marker":{"color":"#26D5FC","line":{"color":"white","width":2}},"name":"Adjusting activities","orientation":"h","showlegend":false,"text":"25%","textfont":{"color":"#000000","size":12},"textposition":"inside","x":[25.0],"y":["What is the school doing to reduce the impact of heat on student athletes?"],"type":"bar","xaxis":"x2","yaxis":"y2"},{"customdata":[""],"hovertemplate":"\u003cb\u003eFinding shade\u003c\u002fb\u003e\u003cbr\u003eCount: 1\u003cbr\u003ePercentage: 12.5%\u003cbr\u003e%{customdata}\u003cextra\u003e\u003c\u002fextra\u003e","insidetextanchor":"middle","legendgroup":"finding shade","marker":{"color":"#2d708e","line":{"color":"white","width":2}},"name":"Finding shade","orientation":"h","showlegend":false,"text":"12%","textfont":{"color":"#FFFFFF","size":12},"textposition":"inside","x":[12.5],"y":["What is the school doing to reduce the impact of heat on student athletes?"],"type":"bar","xaxis":"x2","yaxis":"y2"},{"customdata":[""],"hovertemplate":"\u003cb\u003eHydration\u003c\u002fb\u003e\u003cbr\u003eCount: 3\u003cbr\u003ePercentage: 37.5%\u003cbr\u003e%{customdata}\u003cextra\u003e\u003c\u002fextra\u003e","insidetextanchor":"middle","legendgroup":"hydration","marker":{"color":"#2ab07f","line":{"color":"white","width":2}},"name":"Hydration","orientation":"h","showlegend":false,"text":"38%","textfont":{"color":"#000000","size":12},"textposition":"inside","x":[37.5],"y":["What is the school doing to reduce the impact of heat on student athletes?"],"type":"bar","xaxis":"x2","yaxis":"y2"},{"customdata":[""],"hovertemplate":"\u003cb\u003eIncreased breaks\u003c\u002fb\u003e\u003cbr\u003eCount: 1\u003cbr\u003ePercentage: 12.5%\u003cbr\u003e%{customdata}\u003cextra\u003e\u003c\u002fextra\u003e","insidetextanchor":"middle","legendgroup":"increased breaks","marker":{"color":"#fcd225","line":{"color":"white","width":2}},"name":"Increased breaks","orientation":"h","showlegend":false,"text":"12%","textfont":{"color":"#000000","size":12},"textposition":"inside","x":[12.5],"y":["What is the school doing to reduce the impact of heat on student athletes?"],"type":"bar","xaxis":"x2","yaxis":"y2"},{"customdata":[""],"hovertemplate":"\u003cb\u003eStaying indoors\u003c\u002fb\u003e\u003cbr\u003eCount: 1\u003cbr\u003ePercentage: 12.5%\u003cbr\u003e%{customdata}\u003cextra\u003e\u003c\u002fextra\u003e","insidetextanchor":"middle","legendgroup":"staying indoors","marker":{"color":"#f78410","line":{"color":"white","width":2}},"name":"Staying indoors","orientation":"h","showlegend":false,"text":"12%","textfont":{"color":"#000000","size":12},"textposition":"inside","x":[12.5],"y":["What is the school doing to reduce the impact of heat on student athletes?"],"type":"bar","xaxis":"x2","yaxis":"y2"},{"customdata":[""],"hovertemplate":"\u003cb\u003eFinding shade\u003c\u002fb\u003e\u003cbr\u003eCount: 1\u003cbr\u003ePercentage: 20.0%\u003cbr\u003e%{customdata}\u003cextra\u003e\u003c\u002fextra\u003e","insidetextanchor":"middle","legendgroup":"finding shade","marker":{"color":"#2d708e","line":{"color":"white","width":2}},"name":"Finding shade","orientation":"h","showlegend":false,"text":"20%","textfont":{"color":"#FFFFFF","size":12},"textposition":"inside","x":[20.0],"y":["What is the center doing to reduce the impact of heat for your patients?"],"type":"bar","xaxis":"x3","yaxis":"y3"},{"customdata":[""],"hovertemplate":"\u003cb\u003eHydration\u003c\u002fb\u003e\u003cbr\u003eCount: 2\u003cbr\u003ePercentage: 40.0%\u003cbr\u003e%{customdata}\u003cextra\u003e\u003c\u002fextra\u003e","insidetextanchor":"middle","legendgroup":"hydration","marker":{"color":"#2ab07f","line":{"color":"white","width":2}},"name":"Hydration","orientation":"h","showlegend":false,"text":"40%","textfont":{"color":"#000000","size":12},"textposition":"inside","x":[40.0],"y":["What is the center doing to reduce the impact of heat for your patients?"],"type":"bar","xaxis":"x3","yaxis":"y3"},{"customdata":[""],"hovertemplate":"\u003cb\u003eUse of fans\u003c\u002fb\u003e\u003cbr\u003eCount: 2\u003cbr\u003ePercentage: 40.0%\u003cbr\u003e%{customdata}\u003cextra\u003e\u003c\u002fextra\u003e","insidetextanchor":"middle","legendgroup":"use of fans","marker":{"color":"#d44842","line":{"color":"white","width":2}},"name":"Use of fans","orientation":"h","showlegend":false,"text":"40%","textfont":{"color":"#FFFFFF","size":12},"textposition":"inside","x":[40.0],"y":["What is the center doing to reduce the impact of heat for your patients?"],"type":"bar","xaxis":"x3","yaxis":"y3"}],                        {"template":{"layout":{"colorway":["#fcd225","#f78410","#a62098","#3e049c"],"font":{"family":"'Space Grotesk', 'Inter', sans-serif","size":12}}},"xaxis":{"anchor":"y","domain":[0.0,1.0]},"yaxis":{"anchor":"x","domain":[0.7144,1.0],"showticklabels":false},"xaxis2":{"anchor":"y2","domain":[0.0,1.0]},"yaxis2":{"anchor":"x2","domain":[0.3572,0.6344000000000001],"showticklabels":false},"xaxis3":{"anchor":"y3","domain":[0.0,1.0]},"yaxis3":{"anchor":"x3","domain":[0.0,0.2772],"showticklabels":false},"annotations":[{"font":{"size":14},"showarrow":false,"text":"Teachers: What is the school doing to reduce the impact of heat on your students?","x":0.5,"xanchor":"center","xref":"paper","y":1.0,"yanchor":"bottom","yref":"paper"},{"font":{"size":14},"showarrow":false,"text":"Coaches: What is the school doing to reduce the impact of heat on student athletes?","x":0.5,"xanchor":"center","xref":"paper","y":0.6344000000000001,"yanchor":"bottom","yref":"paper"},{"font":{"size":14},"showarrow":false,"text":"Caregivers: What is the center doing to reduce the impact of heat for your patients?","x":0.5,"xanchor":"center","xref":"paper","y":0.2772,"yanchor":"bottom","yref":"paper"},{"font":{"color":"#D3D3D3","size":12},"showarrow":false,"text":"n = 42","x":0.94,"xanchor":"right","xref":"paper","y":0.96,"yanchor":"top","yref":"paper"},{"font":{"color":"#D3D3D3","size":12},"showarrow":false,"text":"n = 3","x":0.94,"xanchor":"right","xref":"paper","y":0.595,"yanchor":"top","yref":"paper"},{"font":{"color":"#D3D3D3","size":12},"showarrow":false,"text":"n = 2","x":0.94,"xanchor":"right","xref":"paper","y":0.235,"yanchor":"top","yref":"paper"}],"title":{"font":{"size":22},"text":"How schools and nursing homes help students and patients cope with extreme heat","x":0.5,"y":0.98,"xanchor":"center"},"legend":{"font":{"size":12},"orientation":"h","yanchor":"top","y":0.95,"xanchor":"center","x":0.5,"xref":"container","yref":"container","bgcolor":"rgba(255,255,255,0.8)","traceorder":"normal","tracegroupgap":10,"itemwidth":30},"margin":{"t":150,"b":80,"l":40,"r":40},"font":{"family":"sans-serif"},"barmode":"stack","height":1080,"showlegend":true,"plot_bgcolor":"white","paper_bgcolor":"white","autosize":true},                        {"responsive": false, "displayModeBar": false}                    )                };                            </script>
+
+
+
+
+
+
+
+
+</body>
+</html>
