@@ -51,6 +51,23 @@
             overflow-x: hidden;
         }
         
+
+        /* ==================== RESPONSIVE FIX ==================== */
+
+        /* Place near the top of your <style> block, after the CSS reset */
+        img,
+        svg,
+        video,
+        canvas,
+        iframe,
+        .embed-responsive {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+
+
+
         /* ==================== TYPOGRAPHY ==================== */
         h1, h2, h3, h4 {
             font-family: var(--font-display);
@@ -670,6 +687,63 @@
             .centered-content { padding: 0 1.5rem; }
             .viz-container iframe,
             .carousel-slide iframe { min-height: 500px; }
+        }
+
+        /* ---------- Responsive fix for large visual components ---------- */
+
+        /* Hero background – keep full‑bleed but allow the inner content to wrap */
+        .hero {
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* Section title banners (full‑width background images) */
+        .section-title {
+            width: 100vw;               /* span the whole viewport width */
+            margin-left: calc(50% - 50vw);
+            padding: 8rem 2rem;
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* Carousel container – fluid width, limited height */
+        .carousel-container,
+        .carousel-slides {
+            width: 100%;
+            max-width: 100%;            /* never exceed the screen width */
+            overflow-x: auto;
+        }
+
+        /* Individual carousel slides – remove fixed pixel width */
+        .carousel-slide img,
+        .carousel-slide iframe {
+            width: 100%;                /* fill the slide container */
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Plotly visualisations – fluid width, capped height */
+        .viz-container > div[id^=""] {   /* targets the Plotly divs */
+            width: 100% !important;
+            max-width: 100% !important;
+            height: auto !important;
+            min-height: 400px;          /* ensures enough vertical space on mobile */
+        }
+
+        /* Optional: limit the maximum height for very tall plots */
+        .viz-container iframe,
+        .viz-container .iframe-wrapper {
+            max-height: 80vh;           /* never taller than 80% of viewport height */
+        }
+
+        /* Reduce side padding on containers for tiny screens */
+        @media (max-width: 600px) {
+            .container,
+            .container-wide,
+            .centered-content {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
         }
 
         /*#back-to-top {
